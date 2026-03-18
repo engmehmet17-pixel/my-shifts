@@ -25,6 +25,7 @@
         .card[data-center="تازة"] { border-right-color: #9b59b6; }
         .card[data-center="ليلان"] { border-right-color: #e74c3c; }
         .card[data-center="الرشاد"] { border-right-color: #f1c40f; }
+        .card[data-center="مناوب الحراس"] { border-right-color: #1abc9c; } /* لون جديد للحراس */
         
         select { width: 100%; padding: 12px; border-radius: 12px; border: 2px solid #e1e8ed; font-size: 15px; }
         .phone-box { margin-top: 10px; color: #7f8c8d; font-weight: bold; }
@@ -70,38 +71,15 @@
         }
     }
 
-    function logout() {
-        location.reload(); 
-    }
+    function logout() { location.reload(); }
 
-    // تم تعديل ترتيب الأسماء هنا حسب طلبك
     let staffData = JSON.parse(localStorage.getItem('myStaffList')) || {
-        "القطاع": [
-            {n: "علي عبدالكريم حسين", p: "07705122140"}, 
-            {n: "احمد علي هزاع", p: "07708504330"}, 
-            {n: "مؤيد انور علي", p: "07702307824"}, 
-            {n: "محمد اصغر شريف", p: "07705119671"}
-        ],
-        "داقوق": [
-            {n: "سليم طه بزون", p: "07704307475"}, 
-            {n: "جمعة احمد علاوي", p: "07706671144"}, 
-            {n: "خنكار رضا قادر", p: "07748193844"}
-        ],
-        "تازة": [
-            {n: "عماد حسن حسين", p: "07701231951"}, 
-            {n: "مكرم شاكر صالح", p: "07738321128"}, 
-            {n: "غريب عبدالله علي", p: "07738321108"}, 
-            {n: "عقيل حمدي خورشيد", p: "07719849187"}
-        ],
-        "ليلان": [
-            {n: "محمد داود طعمة", p: "07702365033"}, 
-            {n: "هشام كريم علي", p: "07706668042"}, 
-            {n: "شعبان خلف طعمة", p: "07735876486"}
-        ],
-        "الرشاد": [
-            {n: "زياد خلف حسن", p: "07705032908"}, 
-            {n: "عبدالستار احمد صالح", p: "07704914902"}
-        ]
+        "القطاع": [{n: "علي عبدالكريم حسين", p: "07705122140"}, {n: "احمد علي هزاع", p: "07708504330"}, {n: "مؤيد انور علي", p: "07702307824"}, {n: "محمد اصغر شريف", p: "07705119671"}],
+        "داقوق": [{n: "سليم طه بزون", p: "07704307475"}, {n: "جمعة احمد علاوي", p: "07706671144"}, {n: "خنكار رضا قادر", p: "07748193844"}],
+        "تازة": [{n: "عماد حسن حسين", p: "07701231951"}, {n: "مكرم شاكر صالح", p: "07738321128"}, {n: "غريب عبدالله علي", p: "07738321108"}, {n: "عقيل حمدي خورشيد", p: "07719849187"}],
+        "ليلان": [{n: "محمد داود طعمة", p: "07702365033"}, {n: "هشام كريم علي", p: "07706668042"}, {n: "شعبان خلف طعمة", p: "07735876486"}],
+        "الرشاد": [{n: "زياد خلف حسن", p: "07705032908"}, {n: "عبدالستار احمد صالح", p: "07704914902"}],
+        "مناوب الحراس": [{n: "كاظم اسماعيل", p: "07701074918"}, {n: "عقيل اصغر", p: "07701274082"}, {n: "احمد نورالدين", p: "07708592190"}]
     };
 
     function startIntervals() {
@@ -109,17 +87,12 @@
         setInterval(() => {
             const now = new Date();
             document.getElementById('clock').innerText = now.toLocaleTimeString('ar-EG');
-            
             let nextShift = new Date();
             nextShift.setHours(8, 0, 0, 0);
             if (now.getHours() >= 8) nextShift.setDate(nextShift.getDate() + 1);
-            
             let diff = nextShift - now;
-            let h = Math.floor(diff / 3600000);
-            let m = Math.floor((diff % 3600000) / 60000);
-            let s = Math.floor((diff % 60000) / 1000);
+            let h = Math.floor(diff / 3600000), m = Math.floor((diff % 3600000) / 60000), s = Math.floor((diff % 60000) / 1000);
             document.getElementById('countdown').innerText = `المتبقي للتبديل القادم: ${h}س ${m}د ${s}ث`;
-            
             if (h === 0 && m === 0 && s === 0) render();
         }, 1000);
     }
@@ -127,7 +100,8 @@
     function render() {
         const now = new Date();
         const adjustedNow = new Date(now.getTime() - (8 * 60 * 60 * 1000));
-        const refDate = new Date(2026, 2, 8);
+        // التاريخ المرجعي 8 مارس لضبط التوقيت كما اتفقنا
+        const refDate = new Date(2026, 2, 8); 
         const dayDiff = Math.floor((adjustedNow - refDate) / 86400000);
         
         document.getElementById('today-date').innerText = now.toLocaleDateString('ar-EG', {dateStyle: 'full'});
