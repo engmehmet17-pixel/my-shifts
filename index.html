@@ -3,7 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>نظام مناوبات قطاع داقوق الرقمي 2026</title>
+    <title>نظام داقوق الرقمي 2026</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <style>
         :root {
             --main-bg: #0f172a;
@@ -16,15 +17,10 @@
         
         body, html { margin: 0; padding: 0; width: 100%; height: 100%; background: var(--main-bg); color: white; overflow: hidden; }
 
-        /* شريط التثبيت */
-        #install-bar { display: none; background: #1e293b; padding: 12px; justify-content: center; border-bottom: 1px solid var(--accent-blue); }
-
-        /* واجهة الدخول */
         #login-screen { position: fixed; inset: 0; background: radial-gradient(circle at center, #1e293b, #0f172a); display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 1000; text-align: center; }
 
         .enter-btn { background: linear-gradient(45deg, var(--accent-blue), #2563eb); color: white; border: none; padding: 15px 50px; border-radius: 50px; font-size: 1.2rem; font-weight: bold; cursor: pointer; box-shadow: 0 10px 20px rgba(0,0,0,0.3); }
 
-        /* الواجهة الرئيسية */
         #main-dashboard { display: none; height: 100vh; flex-direction: column; padding: 15px; }
 
         .header-card { background: var(--card-bg); backdrop-filter: blur(15px); padding: 15px; border-radius: 25px; text-align: center; border: 1px solid rgba(255,255,255,0.1); margin-bottom: 15px; }
@@ -51,27 +47,23 @@
 </head>
 <body>
 
-    <div id="install-bar">
-        <button onclick="triggerInstall()" style="background:var(--accent-blue); border:none; padding:8px 25px; border-radius:12px; font-weight:bold; color:black;">تثبيت التطبيق 📱</button>
-    </div>
-
     <div id="login-screen">
         <h1 style="margin:0">وزارة الكهرباء العراقية</h1>
-        <p style="opacity:0.7">توزيع الشمال|قطاع داقوق - نظام المناوبات الرقمي</p>
+        <p style="opacity:0.7">توزيع كهرباء الشمال | قطاع داقوق - نظام المناوبات الرقمي</p>
         <div style="margin: 30px 0;"><button class="enter-btn" onclick="startApp()">دخول</button></div>
-        <div style="font-size:0.8rem; color:var(--accent-blue)">م. محمد سهران خورشيد © 2026</div>
+        <div style="font-size:0.8rem; color:var(--accent-blue)">فكرة وتصميم م. محمد سهران خورشيد © 2026</div>
     </div>
 
     <div id="main-dashboard">
         <div class="header-card">
             <div id="date-label" style="font-weight:bold; color:var(--accent-gold)"></div>
-            <div id="clock-label" style="font-size: 2rem; margin: 5px 0;">00:00:00</div>
+            <div id="clock-label" style="font-size: 2rem; margin: 5px 0; letter-spacing: 2px;">00:00:00</div>
             <div id="timer-label" style="font-size:0.85rem; opacity:0.9"></div>
         </div>
         <div class="menu-grid">
             <button class="menu-item bg-blue" onclick="openPage('page-sector')"><i class="material-icons">groups</i><span>المناوبات</span></button>
             <button class="menu-item bg-green" onclick="openPage('page-stations')"><i class="material-icons">ev_station</i><span>المحطات</span></button>
-            <button class="menu-item bg-gold" onclick="openPage('page-report')"><i class="material-icons">print</i><span>طباعة PDF</span></button>
+            <button class="menu-item bg-gold" onclick="openPage('page-report')"><i class="material-icons">table_view</i><span>تحميل Excel</span></button>
             <button class="menu-item bg-red" onclick="location.reload()"><i class="material-icons">power_settings_new</i><span>خروج</span></button>
         </div>
     </div>
@@ -84,10 +76,11 @@
     <div id="page-report" class="sub-page">
         <button class="back-btn" onclick="closePage()">🔙 عودة</button>
         <div style="background:var(--card-bg); padding:20px; border-radius:20px;">
-            <h3 style="text-align:center">توليد تقرير المناوبات</h3>
+            <h3 style="text-align:center">تصدير الجدول إلى Excel</h3>
+            <p style="font-size: 0.8rem; text-align: center; opacity: 0.8;">سيتم حفظ الملف في هاتفك باللغة العربية ومن اليمين لليسار.</p>
             <label>من تاريخ:</label><input type="date" id="report-start">
             <label>إلى تاريخ:</label><input type="date" id="report-end">
-            <button class="enter-btn" style="width:100%; margin-top:15px;" onclick="generatePrintWindow()">طبع الجدول الآن</button>
+            <button class="enter-btn" style="width:100%; margin-top:15px;" onclick="exportToExcel()">تحميل ملف Excel الآن</button>
         </div>
     </div>
 
@@ -142,69 +135,50 @@
     function openPage(id) { document.getElementById(id).style.display = 'flex'; }
     function closePage() { document.querySelectorAll('.sub-page').forEach(p=>p.style.display='none'); }
 
-    // الحل الجديد: فتح نافذة جديدة للطباعة لضمان ظهور البيانات
-    function generatePrintWindow() {
+    // وظيفة التصدير إلى Excel الجديدة
+    function exportToExcel() {
         const sStr = document.getElementById('report-start').value;
         const eStr = document.getElementById('report-end').value;
-        if(!sStr || !eStr) return alert("اختر التاريخ");
+        if(!sStr || !eStr) return alert("يرجى اختيار تاريخ البداية والنهاية");
 
-        const start = new Date(sStr); const end = new Date(eStr);
-        let tableRows = '';
-        let curr = new Date(start); curr.setHours(9,0,0);
+        const start = new Date(sStr);
+        const end = new Date(eStr);
         
+        // تجهيز البيانات للـ Excel
+        const data = [];
+        // العناوين مرتبة من اليمين
+        data.push(["التاريخ", "القطاع", "صيانة داقوق", "صيانة تازة", "صيانة ليلان", "صيانة الرشاد", "حراس القطاع"]);
+
+        let curr = new Date(start);
+        curr.setHours(9, 0, 0);
+
         while(curr <= end) {
-            tableRows += `<tr>
-                <td>${curr.toLocaleDateString('ar-EG')}</td>
-                <td>${staffData["القطاع"].list[getIdx("القطاع", curr)].n}</td>
-                <td>${staffData["صيانة داقوق"].list[getIdx("صيانة داقوق", curr)].n}</td>
-                <td>${staffData["صيانة تازة"].list[getIdx("صيانة تازة", curr)].n}</td>
-                <td>${staffData["صيانة ليلان"].list[getIdx("صيانة ليلان", curr)].n}</td>
-                <td>${staffData["صيانة الرشاد"].list[getIdx("صيانة الرشاد", curr)].n}</td>
-                <td>${staffData["حراس القطاع"].list[getIdx("حراس القطاع", curr)].n}</td>
-            </tr>`;
-            curr.setDate(curr.getDate()+1);
+            data.push([
+                curr.toLocaleDateString('ar-EG'),
+                staffData["القطاع"].list[getIdx("القطاع", curr)].n,
+                staffData["صيانة داقوق"].list[getIdx("صيانة داقوق", curr)].n,
+                staffData["صيانة تازة"].list[getIdx("صيانة تازة", curr)].n,
+                staffData["صيانة ليلان"].list[getIdx("صيانة ليلان", curr)].n,
+                staffData["صيانة الرشاد"].list[getIdx("صيانة الرشاد", curr)].n,
+                staffData["حراس القطاع"].list[getIdx("حراس القطاع", curr)].n
+            ]);
+            curr.setDate(curr.getDate() + 1);
         }
 
-        const printWindow = window.open('', '_blank');
-        printWindow.document.write(`
-            <html dir="rtl" lang="ar">
-            <head>
-                <title>طباعة تقرير المناوبات</title>
-                <style>
-                    body { font-family: 'Segoe UI', Tahoma, sans-serif; padding: 20px; }
-                    h2, p { text-align: center; }
-                    table { width: 100%; border-collapse: collapse; margin-top: 20px; }
-                    th, td { border: 1px solid black; padding: 8px; text-align: center; font-size: 12px; }
-                    th { background-color: #f2f2f2; }
-                </style>
-            </head>
-            <body>
-                <h2>سجل مناوبات قطاع كهرباء داقوق لعام 2026</h2>
-                <p>للفترة من ${sStr} إلى ${eStr}</p>
-                <table>
-                    <thead>
-                        <tr>
-                            <th>التاريخ</th>
-                            <th>القطاع</th>
-                            <th>صيانة داقوق</th>
-                            <th>صيانة تازة</th>
-                            <th>صيانة ليلان</th>
-                            <th>صيانة الرشاد</th>
-                            <th>حراس القطاع</th>
-                        </tr>
-                    </thead>
-                    <tbody>${tableRows}</tbody>
-                </table>
-                <p style="margin-top:30px; font-size:10px;">طبع بواسطة نظام المناوبات الذكي - م. محمد سهران خورشيد</p>
-                <script>window.onload = function() { window.print(); window.close(); };<\/script>
-            </body>
-            </html>
-        `);
-        printWindow.document.close();
+        // إنشاء كتاب العمل والورقة
+        const wb = XLSX.utils.book_new();
+        const ws = XLSX.utils.aoa_to_sheet(data);
+
+        // ضبط اتجاه الورقة من اليمين لليسار (RTL)
+        if(!ws['!views']) ws['!views'] = [{}];
+        ws['!views'][0].rightToLeft = true;
+
+        XLSX.utils.book_append_sheet(wb, ws, "جدول المناوبات");
+
+        // تحميل الملف
+        XLSX.writeFile(wb, `سجل_مناوبات_داقوق_${sStr}.xlsx`);
     }
 
-    let dwP; window.addEventListener('beforeinstallprompt', (e) => { e.preventDefault(); dwP = e; document.getElementById('install-bar').style.display = 'flex'; });
-    function triggerInstall() { if(dwP) { dwP.prompt(); } else { alert("استخدم خيارات المتصفح (إضافة للشاشة الرئيسية)"); } }
 </script>
 </body>
 </html>
