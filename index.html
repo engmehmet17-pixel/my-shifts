@@ -4,63 +4,34 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>نظام داقوق الرقمي 2026</title>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.23/jspdf.plugin.autotable.min.js"></script>
-    
     <style>
         :root {
             --main-bg: #0f172a;
             --card-bg: rgba(255, 255, 255, 0.08);
             --accent-blue: #38bdf8;
-            --accent-green: #10b981;
             --accent-gold: #fbbf24;
-            --accent-red: #f87171;
         }
 
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; font-family: 'Segoe UI', Tahoma, sans-serif; }
         
-        body, html { 
-            margin: 0; padding: 0; width: 100%; height: 100%; 
-            background: var(--main-bg); color: white; overflow: hidden; 
-        }
+        body, html { margin: 0; padding: 0; width: 100%; height: 100%; background: var(--main-bg); color: white; overflow: hidden; }
 
-        /* شريط التثبيت العلوي */
-        #install-bar {
-            display: none; background: #1e293b; padding: 12px;
-            display: flex; justify-content: center; border-bottom: 1px solid var(--accent-blue);
-        }
+        /* شريط التثبيت */
+        #install-bar { display: none; background: #1e293b; padding: 12px; justify-content: center; border-bottom: 1px solid var(--accent-blue); }
 
         /* واجهة الدخول */
-        #login-screen {
-            position: fixed; inset: 0; background: radial-gradient(circle at center, #1e293b, #0f172a);
-            display: flex; flex-direction: column; align-items: center; justify-content: center;
-            z-index: 1000; text-align: center;
-        }
+        #login-screen { position: fixed; inset: 0; background: radial-gradient(circle at center, #1e293b, #0f172a); display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 1000; text-align: center; }
 
-        .enter-btn {
-            background: linear-gradient(45deg, var(--accent-blue), #2563eb);
-            color: white; border: none; padding: 15px 50px; border-radius: 50px;
-            font-size: 1.2rem; font-weight: bold; cursor: pointer;
-            box-shadow: 0 10px 20px rgba(0,0,0,0.3); transition: 0.3s;
-        }
+        .enter-btn { background: linear-gradient(45deg, var(--accent-blue), #2563eb); color: white; border: none; padding: 15px 50px; border-radius: 50px; font-size: 1.2rem; font-weight: bold; cursor: pointer; box-shadow: 0 10px 20px rgba(0,0,0,0.3); }
 
         /* الواجهة الرئيسية */
         #main-dashboard { display: none; height: 100vh; flex-direction: column; padding: 15px; }
 
-        .header-card {
-            background: var(--card-bg); backdrop-filter: blur(15px);
-            padding: 15px; border-radius: 25px; text-align: center;
-            border: 1px solid rgba(255,255,255,0.1); margin-bottom: 15px;
-        }
+        .header-card { background: var(--card-bg); backdrop-filter: blur(15px); padding: 15px; border-radius: 25px; text-align: center; border: 1px solid rgba(255,255,255,0.1); margin-bottom: 15px; }
 
-        /* شبكة الأزرار مع الأيقونات */
         .menu-grid { display: grid; grid-template-columns: 1fr 1fr; grid-gap: 12px; flex-grow: 1; }
 
-        .menu-item {
-            border-radius: 20px; display: flex; flex-direction: column;
-            align-items: center; justify-content: center; border: none; color: white;
-            font-weight: bold; font-size: 1rem; cursor: pointer; gap: 10px;
-        }
+        .menu-item { border-radius: 20px; display: flex; flex-direction: column; align-items: center; justify-content: center; border: none; color: white; font-weight: bold; cursor: pointer; gap: 10px; }
         .menu-item i { font-size: 2.5rem; }
 
         .bg-blue { background: linear-gradient(135deg, #1e40af, #3b82f6); }
@@ -68,234 +39,169 @@
         .bg-gold { background: linear-gradient(135deg, #92400e, #f59e0b); }
         .bg-red { background: linear-gradient(135deg, #991b1b, #ef4444); }
 
-        /* الصفحات الفرعية */
-        .sub-page {
-            position: fixed; inset: 0; background: var(--main-bg); z-index: 500;
-            display: none; flex-direction: column; padding: 15px;
-        }
+        .sub-page { position: fixed; inset: 0; background: var(--main-bg); z-index: 500; display: none; flex-direction: column; padding: 15px; }
 
         .back-btn { background: #334155; color: white; border: none; padding: 10px 20px; border-radius: 12px; margin-bottom: 10px; align-self: flex-start; }
 
-        .shift-card {
-            background: var(--card-bg); padding: 15px; border-radius: 20px;
-            margin-bottom: 10px; border-right: 6px solid var(--accent-blue);
-        }
+        .shift-card { background: var(--card-bg); padding: 15px; border-radius: 20px; margin-bottom: 10px; border-right: 6px solid var(--accent-blue); }
 
-        .report-form { background: var(--card-bg); padding: 20px; border-radius: 25px; border: 1px solid rgba(255,255,255,0.1); }
         input[type="date"] { width: 100%; padding: 12px; margin: 10px 0; border-radius: 10px; background: #1e293b; color: white; border: 1px solid #334155; }
 
+        /* تنسيق الطباعة السحري */
+        @media print {
+            body * { visibility: hidden; }
+            #print-area, #print-area * { visibility: visible; color: black !important; }
+            #print-area { position: absolute; left: 0; top: 0; width: 100%; direction: rtl; }
+            table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+            th, td { border: 1px solid #ddd; padding: 8px; text-align: center; font-size: 10px; }
+            th { background-color: #f2f2f2 !important; }
+            .no-print { display: none; }
+        }
     </style>
     <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
 </head>
 <body>
 
     <div id="install-bar">
-        <button onclick="triggerInstall()" style="background:var(--accent-blue); border:none; padding:8px 25px; border-radius:12px; font-weight:bold; display:flex; align-items:center; gap:5px;">
-            <i class="material-icons" style="font-size:18px">download_for_offline</i> تثبيت التطبيق
-        </button>
+        <button onclick="triggerInstall()" style="background:var(--accent-blue); border:none; padding:8px 25px; border-radius:12px; font-weight:bold; color:black;">تثبيت التطبيق 📱</button>
     </div>
 
     <div id="login-screen">
-        <div style="font-size: 3rem; margin-bottom: 10px;">⚡</div>
         <h1 style="margin:0">وزارة الكهرباء</h1>
-        <p style="opacity:0.7">قطاع كهرباء داقوق</p>
-        <div style="margin: 30px 0;">
-            <button class="enter-btn" onclick="startApp()">الدخول للمناوبات</button>
-        </div>
-        <div style="font-size:0.8rem; color:var(--accent-blue)">فكرة وتصميم: م. محمد سهران خورشيد © 2026</div>
+        <p style="opacity:0.7">قطاع داقوق - نظام المناوبات</p>
+        <div style="margin: 30px 0;"><button class="enter-btn" onclick="startApp()">دخول</button></div>
+        <div style="font-size:0.8rem; color:var(--accent-blue)">م. محمد سهران خورشيد © 2026</div>
     </div>
 
     <div id="main-dashboard">
         <div class="header-card">
             <div id="date-label" style="font-weight:bold; color:var(--accent-gold)"></div>
-            <div id="clock-label" style="font-size: 2rem; margin: 5px 0; letter-spacing: 2px;">00:00:00</div>
+            <div id="clock-label" style="font-size: 2rem; margin: 5px 0;">00:00:00</div>
             <div id="timer-label" style="font-size:0.85rem; opacity:0.9"></div>
         </div>
-
         <div class="menu-grid">
-            <button class="menu-item bg-blue" onclick="openPage('page-sector')">
-                <i class="material-icons">groups</i><span>مناوبات القطاع</span>
-            </button>
-            <button class="menu-item bg-green" onclick="openPage('page-stations')">
-                <i class="material-icons">ev_station</i><span>المحطات</span>
-            </button>
-            <button class="menu-item bg-gold" onclick="openPage('page-report')">
-                <i class="material-icons">picture_as_pdf</i><span>طباعة التقرير</span>
-            </button>
-            <button class="menu-item bg-red" onclick="appExit()">
-                <i class="material-icons">power_settings_new</i><span>خروج</span>
-            </button>
+            <button class="menu-item bg-blue" onclick="openPage('page-sector')"><i class="material-icons">groups</i><span>المناوبات</span></button>
+            <button class="menu-item bg-green" onclick="openPage('page-stations')"><i class="material-icons">ev_station</i><span>المحطات</span></button>
+            <button class="menu-item bg-gold" onclick="openPage('page-report')"><i class="material-icons">print</i><span>طباعة PDF</span></button>
+            <button class="menu-item bg-red" onclick="location.reload()"><i class="material-icons">power_settings_new</i><span>خروج</span></button>
         </div>
     </div>
 
     <div id="page-sector" class="sub-page">
         <button class="back-btn" onclick="closePage()">🔙 عودة</button>
-        <div id="sector-list" style="overflow-y:auto; flex-grow:1; padding-bottom:20px;"></div>
-    </div>
-
-    <div id="page-stations" class="sub-page">
-        <button class="back-btn" onclick="closePage()">🔙 عودة</button>
-        <div class="header-card" style="border-color:var(--accent-green)">
-            <h3 style="margin:0">مناوبي المحطات</h3>
-            <p style="font-size:0.8rem">بيانات تجريبية - قابلة للإضافة</p>
-        </div>
-        <div id="station-list" style="overflow-y:auto;"></div>
+        <div id="sector-list" style="overflow-y:auto; flex-grow:1;"></div>
     </div>
 
     <div id="page-report" class="sub-page">
         <button class="back-btn" onclick="closePage()">🔙 عودة</button>
-        <div class="report-form">
-            <h3 style="text-align:center; color:var(--accent-gold)">توليد سجل المناوبات PDF</h3>
-            <p style="font-size:0.8rem; text-align:center">سيتم طبع البيانات للفترة المختارة أدناه من اليمين لليوم.</p>
-            <label>من تاريخ:</label>
-            <input type="date" id="report-start">
-            <label>إلى تاريخ:</label>
-            <input type="date" id="report-end">
-            <button class="enter-btn" style="width:100%; margin-top:15px;" onclick="generatePDF()">طبع الجدول الآن</button>
+        <div style="background:var(--card-bg); padding:20px; border-radius:20px;">
+            <h3 style="text-align:center">توليد تقرير المناوبات</h3>
+            <label>من تاريخ:</label><input type="date" id="report-start">
+            <label>إلى تاريخ:</label><input type="date" id="report-end">
+            <button class="enter-btn" style="width:100%; margin-top:15px;" onclick="prepareReport()">توليد ومعاينة الطباعة</button>
+        </div>
+        <div id="print-area" style="display:none;">
+            <h2 style="text-align:center">سجل مناوبات قطاع كهرباء داقوق لعام 2026</h2>
+            <p id="print-range" style="text-align:center"></p>
+            <table id="report-table">
+                <thead>
+                    <tr>
+                        <th>التاريخ</th>
+                        <th>القطاع</th>
+                        <th>صيانة داقوق</th>
+                        <th>صيانة تازة</th>
+                        <th>صيانة ليلان</th>
+                        <th>صيانة الرشاد</th>
+                        <th>حراس القطاع</th>
+                    </tr>
+                </thead>
+                <tbody id="report-body"></tbody>
+            </table>
+            <p style="margin-top:20px; font-size:10px;">طبع بواسطة نظام المناوبات الذكي - م. محمد سهران خورشيد</p>
         </div>
     </div>
 
+    <div id="page-stations" class="sub-page">
+        <button class="back-btn" onclick="closePage()">🔙 عودة</button>
+        <div class="header-card"><h3>مناوبي المحطات</h3><p>قيد التحديث...</p></div>
+    </div>
+
 <script>
-    // الإعدادات الزمنية: البداية من السبت 4 نيسان 2026
-    const START_DATE = new Date(2026, 3, 4, 8, 0, 0); 
+    const START_REF = new Date(2026, 3, 4, 8, 0, 0); // السبت 4 نيسان 2026
 
     const staffData = {
-        "القطاع المركزي": { color: "#38bdf8", type: "daily", list: [
-            {n: "احمد علي هزاع", p: "07708504330"}, {n: "مؤيد انور علي", p: "07702307824"}, 
-            {n: "محمد أصغر شريف", p: "07705119671"}, {n: "علي عبدالكريم حسين", p: "07705122140"}
-        ]},
-        "صيانة داقوق": { color: "#fb923c", type: "daily", list: [
-            {n: "جمعة احمد علاوي", p: "07706671144"}, {n: "خنكار رضا قادر", p: "07748193844"}, {n: "سليم طه بزون", p: "07704307475"}
-        ]},
-        "صيانة تازة": { color: "#c084fc", type: "daily", list: [
-            {n: "مكرم شاكر صالح", p: "07738321128"}, {n: "غريب عبدالله علي", p: "07738321108"}, 
-            {n: "عقيل حمدي خورشيد", p: "07719849187"}, {n: "عماد حسن حسين", p: "07701231951"}
-        ]},
-        "صيانة ليلان (يومين)": { color: "#f87171", type: "two-day", list: [
-            {n: "محمد داود طعمة", p: "07702365033"}, {n: "هشام كريم علي", p: "07706668042"}, {n: "شعبان خلف طعمة", p: "07735876486"}
-        ]},
-        "صيانة الرشاد (يومين)": { color: "#4adede", type: "two-day", list: [
-            {n: "زياد خلف حسن", p: "07705032908"}, {n: "عبدالستار احمد صالح", p: "07704914902"}
-        ]},
-        "حراس القطاع": { color: "#10b981", type: "daily", list: [
-            {n: "احمد نورالدين", p: "07708592190"}, {n: "كاظم اسماعيل", p: "07701074918"}, {n: "عقيل أصغر", p: "07701274082"}
-        ]}
+        "القطاع": { type: "daily", list: [{n: "احمد علي هزاع", p: "07708504330"}, {n: "مؤيد انور علي", p: "07702307824"}, {n: "محمد أصغر شريف", p: "07705119671"}, {n: "علي عبدالكريم حسين", p: "07705122140"}]},
+        "داقوق": { type: "daily", list: [{n: "جمعة احمد علاوي", p: "07706671144"}, {n: "خنكار رضا قادر", p: "07748193844"}, {n: "سليم طه بزون", p: "07704307475"}]},
+        "تازة": { type: "daily", list: [{n: "مكرم شاكر صالح", p: "07738321128"}, {n: "غريب عبدالله علي", p: "07738321108"}, {n: "عقيل حمدي خورشيد", p: "07719849187"}, {n: "عماد حسن حسين", p: "07701231951"}]},
+        "ليلان": { type: "two-day", list: [{n: "محمد داود طعمة", p: "07702365033"}, {n: "هشام كريم علي", p: "07706668042"}, {n: "شعبان خلف طعمة", p: "07735876486"}]},
+        "الرشاد": { type: "two-day", list: [{n: "زياد خلف حسن", p: "07705032908"}, {n: "عبدالستار احمد صالح", p: "07704914902"}]},
+        "الحراس": { type: "daily", list: [{n: "احمد نورالدين", p: "07708592190"}, {n: "كاظم اسماعيل", p: "07701074918"}, {n: "عقيل أصغر", p: "07701274082"}]}
     };
 
-    function startApp() {
-        document.getElementById('login-screen').style.display = 'none';
-        document.getElementById('main-dashboard').style.display = 'flex';
-        runClock();
-        renderSector();
-    }
+    function startApp() { document.getElementById('login-screen').style.display = 'none'; document.getElementById('main-dashboard').style.display = 'flex'; runClock(); renderSector(); }
 
     function runClock() {
         setInterval(() => {
             const now = new Date();
             document.getElementById('date-label').innerText = now.toLocaleDateString('ar-EG', {weekday:'long', day:'numeric', month:'long', year:'numeric'});
             document.getElementById('clock-label').innerText = now.toLocaleTimeString('ar-EG');
-            
-            let next = new Date();
-            next.setHours(8,0,0,0);
-            if(now.getHours() >= 8) next.setDate(next.getDate()+1);
+            let next = new Date(); next.setHours(8,0,0,0); if(now.getHours() >= 8) next.setDate(next.getDate()+1);
             let diff = next - now;
             let h = Math.floor(diff/3600000), m = Math.floor((diff%3600000)/60000), s = Math.floor((diff%60000)/1000);
-            document.getElementById('timer-label').innerText = `المتبقي للتبديل القادم: ${h}س و ${m}د و ${s}ث`;
+            document.getElementById('timer-label').innerText = `المتبقي للتبديل: ${h}س و ${m}د و ${s}ث`;
         }, 1000);
     }
 
-    function getStaffIndex(key, date) {
+    function getIdx(key, date) {
+        const d = new Date(date); if(d.getHours() < 8) d.setDate(d.getDate()-1);
+        const diff = Math.floor((d - START_REF) / 86400000);
+        if(diff < 0) return 0;
         const item = staffData[key];
-        const target = new Date(date);
-        if(target.getHours() < 8) target.setDate(target.getDate()-1);
-        
-        const days = Math.floor((target - START_REF_FIXED()) / 86400000);
-        if(days < 0) return 0;
-        return item.type === "two-day" ? Math.floor(days/2) % item.list.length : days % item.list.length;
+        return item.type === "two-day" ? Math.floor(diff/2) % item.list.length : diff % item.list.length;
     }
 
-    function START_REF_FIXED() { return new Date(2026, 3, 4, 8, 0, 0); }
-
     function renderSector() {
-        let h = '';
-        const now = new Date();
+        let h = ''; const now = new Date();
         for(let k in staffData) {
-            const p = staffData[k].list[getStaffIndex(k, now)];
-            h += `<div class="shift-card" style="border-right-color:${staffData[k].color}">
-                    <small style="opacity:0.6">${k}</small>
-                    <div style="font-weight:bold; font-size:1.1rem">${p.n}</div>
-                    <div style="color:var(--accent-blue)">📞 ${p.p}</div>
-                  </div>`;
+            const p = staffData[k].list[getIdx(k, now)];
+            h += `<div class="shift-card"><div>${k}</div><b>${p.n}</b><div style="color:var(--accent-blue)">${p.p}</div></div>`;
         }
         document.getElementById('sector-list').innerHTML = h;
     }
 
     function openPage(id) { document.getElementById(id).style.display = 'flex'; }
     function closePage() { document.querySelectorAll('.sub-page').forEach(p=>p.style.display='none'); }
-    function appExit() { if(confirm("هل تريد إغلاق النظام؟")) location.reload(); }
 
-    // إصلاح طباعة PDF باللغة العربية والاتجاه
-    async function generatePDF() {
-        const start = document.getElementById('report-start').value;
-        const end = document.getElementById('report-end').value;
-        if(!start || !end) return alert("يرجى تحديد التاريخ أولاً");
+    function prepareReport() {
+        const sStr = document.getElementById('report-start').value;
+        const eStr = document.getElementById('report-end').value;
+        if(!sStr || !eStr) return alert("اختر التاريخ");
 
-        if(confirm(`تأكيد: سيتم طبع بيانات المناوبات من ${start} إلى ${end} وتنسيقها من اليمين لليوم؟`)) {
-            const { jsPDF } = window.jspdf;
-            const doc = new jsPDF('l', 'pt', 'a4'); // وضع Landscape
-            
-            let rows = [];
-            let curr = new Date(start);
-            curr.setHours(9,0,0);
-            const endD = new Date(end);
-            endD.setHours(23,0,0);
-
-            while(curr <= endD) {
-                // ملاحظة: jsPDF لا يدعم العربية مباشرة بدون ملفات خطوط، 
-                // سنستخدم أحرف لاتينية/رموز أو جدول مصمم برمجياً لضمان عدم ظهور "رموز غريبة"
-                rows.push([
-                    curr.toLocaleDateString('en-GB'), // التاريخ
-                    staffData["حراس القطاع"].list[getStaffIndex("حراس القطاع", curr)].n,
-                    staffData["صيانة الرشاد (يومين)"].list[getStaffIndex("صيانة الرشاد (يومين)", curr)].n,
-                    staffData["صيانة ليلان (يومين)"].list[getStaffIndex("صيانة ليلان (يومين)", curr)].n,
-                    staffData["صيانة تازة"].list[getStaffIndex("صيانة تازة", curr)].n,
-                    staffData["صيانة داقوق"].list[getStaffIndex("صيانة داقوق", curr)].n,
-                    staffData["القطاع المركزي"].list[getStaffIndex("القطاع المركزي", curr)].n
-                ]);
-                curr.setDate(curr.getDate()+1);
-            }
-
-            // ترتيب الأعمدة من اليمين لليوم (عكس المصفوفة)
-            doc.autoTable({
-                head: [['Date', 'Guard', 'Rashad', 'Laylan', 'Taza', 'Daquq', 'Sector']],
-                body: rows,
-                theme: 'grid',
-                styles: { halign: 'center', fontSize: 10 },
-                headStyles: { fillColor: [44, 62, 80] }
-            });
-
-            doc.save('Kirkuk_Shifts_2026.pdf');
+        const start = new Date(sStr); const end = new Date(eStr);
+        document.getElementById('print-range').innerText = `للفترة من ${sStr} إلى ${eStr}`;
+        
+        let html = '';
+        let curr = new Date(start); curr.setHours(9,0,0);
+        while(curr <= end) {
+            html += `<tr>
+                <td>${curr.toLocaleDateString('ar-EG')}</td>
+                <td>${staffData["القطاع"].list[getIdx("القطاع", curr)].n}</td>
+                <td>${staffData["داقوق"].list[getIdx("داقوق", curr)].n}</td>
+                <td>${staffData["تازة"].list[getIdx("تازة", curr)].n}</td>
+                <td>${staffData["ليلان"].list[getIdx("ليلان", curr)].n}</td>
+                <td>${staffData["الرشاد"].list[getIdx("الرشاد", curr)].n}</td>
+                <td>${staffData["الحراس"].list[getIdx("الحراس", curr)].n}</td>
+            </tr>`;
+            curr.setDate(curr.getDate()+1);
         }
+        document.getElementById('report-body').innerHTML = html;
+        document.getElementById('print-area').style.display = 'block';
+        window.print();
+        setTimeout(() => { document.getElementById('print-area').style.display = 'none'; }, 1000);
     }
 
-    // منطق تثبيت التطبيق PWA
-    let dwP;
-    window.addEventListener('beforeinstallprompt', (e) => {
-        e.preventDefault();
-        dwP = e;
-        document.getElementById('install-bar').style.display = 'flex';
-    });
-
-    function triggerInstall() {
-        if(dwP) {
-            dwP.prompt();
-            dwP.userChoice.then((choice) => {
-                if(choice.outcome === 'accepted') document.getElementById('install-bar').style.display='none';
-            });
-        } else {
-            alert("للتثبيت: اضغط على زر 'Add to Home Screen' من إعدادات المتصفح لديك.");
-        }
-    }
+    let dwP; window.addEventListener('beforeinstallprompt', (e) => { e.preventDefault(); dwP = e; document.getElementById('install-bar').style.display = 'flex'; });
+    function triggerInstall() { if(dwP) { dwP.prompt(); } else { alert("استخدم خيارات المتصفح (إضافة للشاشة الرئيسية)"); } }
 </script>
 </body>
 </html>
