@@ -2,134 +2,358 @@
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <title>نظام المناوبات - قطاع داقوق</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>نظام إدارة المناوبات الذكي</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.23/jspdf.plugin.autotable.min.js"></script>
     <style>
-        body { font-family: 'Segoe UI', sans-serif; background: #f4f7f6; padding: 15px; margin: 0; }
+        :root {
+            --primary: #2c3e50;
+            --accent: #3498db;
+            --bg: #f0f2f5;
+            --white: #ffffff;
+            --gradient: linear-gradient(135deg, #2c3e50 0%, #000000 100%);
+        }
+
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
         
+        body, html { 
+            margin: 0; padding: 0; width: 100%; height: 100%; 
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: var(--bg); overflow: hidden; /* منع التمرير */
+        }
+
         /* واجهة الدخول */
-        #login-page { text-align: center; margin-top: 50px; background: white; padding: 30px; border-radius: 20px; box-shadow: 0 10px 20px rgba(0,0,0,0.1); }
-        .login-header h1 { font-size: 1.4em; color: #2c3e50; margin-bottom: 5px; }
-        .login-header p { font-size: 0.9em; color: #666; margin: 2px 0; }
-        input { width: 80%; padding: 12px; margin: 10px 0; border-radius: 10px; border: 1px solid #ddd; }
-        button { background: #2c3e50; color: white; padding: 10px 30px; border-radius: 10px; border: none; cursor: pointer; }
-        
-        /* واجهة الجدول */
-        #main-app { display: none; }
-        .header { background: white; padding: 15px; border-radius: 15px; margin-bottom: 20px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); text-align: center; position: relative; }
-        .timer-box { font-size: 14px; color: #e67e22; font-weight: bold; margin-top: 5px; }
-        .logout-btn { background: #e74c3c; color: white; padding: 5px 10px; border-radius: 5px; border: none; cursor: pointer; position: absolute; left: 15px; top: 15px; }
-        
-        .card { background: white; padding: 18px; border-radius: 20px; margin-bottom: 15px; box-shadow: 0 8px 12px rgba(0,0,0,0.05); border-right: 10px solid; }
-        .card[data-center="القطاع"] { border-right-color: #3498db; }
-        .card[data-center="داقوق"] { border-right-color: #e67e22; }
-        .card[data-center="تازة"] { border-right-color: #9b59b6; }
-        .card[data-center="ليلان"] { border-right-color: #e74c3c; }
-        .card[data-center="الرشاد"] { border-right-color: #f1c40f; }
-        .card[data-center="مناوب الحراس"] { border-right-color: #1abc9c; } /* لون جديد للحراس */
-        
-        select { width: 100%; padding: 12px; border-radius: 12px; border: 2px solid #e1e8ed; font-size: 15px; }
-        .phone-box { margin-top: 10px; color: #7f8c8d; font-weight: bold; }
+        #login-screen {
+            position: fixed; inset: 0; background: var(--gradient);
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            z-index: 1000; color: white; text-align: center; padding: 20px;
+        }
+
+        .hero-title { font-size: 1.8rem; margin-bottom: 10px; font-weight: bold; }
+        .hero-subtitle { font-size: 1rem; opacity: 0.8; margin-bottom: 30px; }
+        .signature { font-size: 0.8rem; margin-top: 40px; color: #bdc3c7; }
+
+        .enter-btn {
+            background: var(--accent); color: white; border: none;
+            padding: 15px 50px; border-radius: 30px; font-size: 1.2rem;
+            cursor: pointer; box-shadow: 0 10px 20px rgba(0,0,0,0.3);
+            transition: transform 0.3s;
+        }
+
+        /* الواجهة الرئيسية */
+        #main-dashboard {
+            display: none; height: 100vh; flex-direction: column; padding: 15px;
+        }
+
+        .header-info {
+            background: var(--white); padding: 15px; border-radius: 20px;
+            text-align: center; box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+            margin-bottom: 15px;
+        }
+
+        .timer-highlight { color: #e67e22; font-weight: bold; font-size: 0.9rem; margin-top: 5px; }
+
+        /* شبكة الأزرار */
+        .menu-grid {
+            display: grid; grid-template-columns: 1fr 1fr; grid-gap: 15px; flex-grow: 1;
+        }
+
+        .menu-card {
+            background: var(--white); border-radius: 25px; display: flex;
+            flex-direction: column; align-items: center; justify-content: center;
+            text-align: center; padding: 15px; font-weight: bold; color: var(--primary);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.05); transition: 0.3s;
+            border: 1px solid rgba(0,0,0,0.05);
+        }
+
+        .menu-card i { font-size: 2.5rem; margin-bottom: 10px; display: block; }
+
+        /* واجهات الصفحات الفرعية */
+        .sub-page {
+            position: fixed; inset: 0; background: var(--bg); z-index: 500;
+            display: none; flex-direction: column; padding: 15px;
+        }
+
+        .content-area {
+            flex-grow: 1; overflow-y: auto; padding-bottom: 20px;
+            -ms-overflow-style: none; scrollbar-width: none;
+        }
+        .content-area::-webkit-scrollbar { display: none; }
+
+        .shift-card {
+            background: white; margin-bottom: 12px; padding: 15px;
+            border-radius: 18px; border-right: 6px solid var(--accent);
+            display: flex; justify-content: space-between; align-items: center;
+        }
+
+        .back-btn {
+            background: var(--primary); color: white; border: none;
+            padding: 10px 20px; border-radius: 12px; margin-bottom: 10px; align-self: flex-start;
+        }
+
+        /* التقرير */
+        .report-inputs { background: white; padding: 20px; border-radius: 20px; }
+        input[type="date"] { width: 100%; padding: 10px; margin: 10px 0; border-radius: 10px; border: 1px solid #ddd; }
+
     </style>
 </head>
 <body>
 
-<div id="login-page">
-    <div class="login-header">
-        <h1>وزارة الكهرباء العراقية</h1>
-        <p>الشركة العامة لتوزيع كهرباء الشمال</p>
-        <p>قطاع كهرباء داقوق</p>
-        <p>شعبة الشكاوي وشؤون المواطنين</p>
+    <div id="login-screen">
+        <div class="hero-title">وزارة الكهرباء العراقية</div>
+        <div class="hero-subtitle">نظام إدارة مناوبات قطاع داقوق الرقمي</div>
+        <button class="enter-btn" onclick="openApp()">دخول للنظام</button>
+        <div class="signature">من فكرة وتصميم: م. محمد سهران خورشيد © 2026</div>
+        <button id="install-btn" style="display:none; margin-top:20px; background:none; border:1px solid white; color:white; padding:5px 15px; border-radius:20px;">تثبيت التطبيق 📱</button>
     </div>
-    <hr style="border: 0; border-top: 1px solid #eee; margin: 20px 0;">
-    <h2>🔐 تسجيل الدخول</h2>
-    <input type="text" id="username" placeholder="اسم المستخدم"><br>
-    <input type="password" id="password" placeholder="الرمز السري"><br>
-    <button onclick="checkLogin()">دخول</button>
-    <p id="error-msg" style="color:red;"></p>
-</div>
 
-<div id="main-app">
-    <div class="header">
-        <button class="logout-btn" onclick="logout()">خروج 🚪</button>
-        <div style="text-align: center;">
-            <strong id="clock">00:00:00</strong>
-            <div id="today-date" style="font-size: 12px;"></div>
-            <div class="timer-box" id="countdown">جاري الحساب...</div>
+    <div id="main-dashboard">
+        <div class="header-info">
+            <div id="live-date" style="font-weight: bold; font-size: 1.1rem;"></div>
+            <div id="live-clock">00:00:00</div>
+            <div class="timer-highlight" id="countdown-timer">جاري الحساب...</div>
+        </div>
+
+        <div class="menu-grid">
+            <div class="menu-card" onclick="showPage('sector-page')">
+                <span style="font-size:30px">🏢</span><br>مناوبي القطاع والصيانات
+            </div>
+            <div class="menu-card" onclick="showPage('stations-page')">
+                <span style="font-size:30px">⚡</span><br>مناوبي المحطات
+            </div>
+            <div class="menu-card" onclick="showPage('report-page')">
+                <span style="font-size:30px">📑</span><br>سجل المناوبات والتقارير
+            </div>
+            <div class="menu-card" style="color:#e74c3c" onclick="confirmExit()">
+                <span style="font-size:30px">🚪</span><br>خروج من التطبيق
+            </div>
         </div>
     </div>
-    <div id="app"></div>
-</div>
+
+    <div id="sector-page" class="sub-page">
+        <button class="back-btn" onclick="closePages()">🔙 عودة</button>
+        <div class="content-area" id="sector-list">
+            </div>
+    </div>
+
+    <div id="stations-page" class="sub-page">
+        <button class="back-btn" onclick="closePages()">🔙 عودة</button>
+        <div class="header-info">
+            <div id="live-date-st" style="font-weight: bold;"></div>
+            <div class="timer-highlight" id="countdown-timer-st"></div>
+        </div>
+        <div class="content-area">
+            <p style="text-align:center; color:#7f8c8d;">سيتم إضافة بيانات المحطات قريباً</p>
+            <div id="station-list"></div>
+        </div>
+    </div>
+
+    <div id="report-page" class="sub-page">
+        <button class="back-btn" onclick="closePages()">🔙 عودة</button>
+        <div class="report-inputs">
+            <h3>توليد تقرير PDF الذكي</h3>
+            <label>من تاريخ:</label>
+            <input type="date" id="date-from">
+            <label>إلى تاريخ:</label>
+            <input type="date" id="date-to">
+            <button class="enter-btn" style="width:100%; margin-top:15px;" onclick="generatePDF()">توليد وتحميل التقرير</button>
+        </div>
+    </div>
 
 <script>
-    function checkLogin() {
-        if (document.getElementById('username').value === "داقوق" && document.getElementById('password').value === "1122") {
-            document.getElementById('login-page').style.display = 'none';
-            document.getElementById('main-app').style.display = 'block';
-            startIntervals();
-        } else {
-            document.getElementById('error-msg').innerText = "خطأ في اسم المستخدم أو الرمز!";
+    // البيانات الأساسية
+    const staffData = {
+        "القطاع": [
+            {n: "احمد علي هزاع", p: "07708504330"},
+            {n: "مؤيد انور علي", p: "07702307824"},
+            {n: "محمد أصغر شريف", p: "07705119671"},
+            {n: "علي عبدالكريم حسين", p: "07705122140"}
+        ],
+        "صيانة داقوق": [
+            {n: "جمعة احمد علاوي", p: "07706671144"},
+            {n: "خنكار رضا قادر", p: "07748193844"},
+            {n: "سليم طه بزون", p: "07704307475"}
+        ],
+        "صيانة تازة": [
+            {n: "مكرم شاكر صالح", p: "07738321128"},
+            {n: "غريب عبدالله علي", p: "07738321108"},
+            {n: "عقيل حمدي خورشيد", p: "07719849187"},
+            {n: "عماد حسن حسين", p: "07701231951"}
+        ],
+        "صيانة ليلان": [ // كل يومين
+            {n: "محمد داود طعمة", p: "07702365033"},
+            {n: "هشام كريم علي", p: "07706668042"},
+            {n: "شعبان خلف طعمة", p: "07735876486"}
+        ],
+        "صيانة الرشاد": [ // كل يومين
+            {n: "زياد خلف حسن", p: "07705032908"},
+            {n: "عبدالستار احمد صالح", p: "07704914902"}
+        ],
+        "حراس القطاع": [
+            {n: "احمد نورالدين", p: "07708592190"},
+            {n: "كاظم اسماعيل", p: "07701074918"},
+            {n: "عقيل أصغر", p: "07701274082"}
+        ]
+    };
+
+    const stations = ["محطة داقوق القديمة", "محطة داقوق الجديدة", "محطة تازة", "محطة البشير الجديدة", "محطة قره حسن (ليلان)", "محطة الرشاد"];
+
+    // مرجع زمني ثابت (8 صباحاً)
+    const REFERENCE_DATE = new Date(2026, 0, 1, 8, 0, 0); // 1 يناير 2026 الساعة 8 صباحاً
+
+    function openApp() {
+        document.getElementById('login-screen').style.display = 'none';
+        document.getElementById('main-dashboard').style.display = 'flex';
+        initClock();
+        renderShifts();
+    }
+
+    function showPage(id) {
+        document.getElementById(id).style.display = 'flex';
+    }
+
+    function closePages() {
+        document.querySelectorAll('.sub-page').forEach(p => p.style.display = 'none');
+    }
+
+    function confirmExit() {
+        if(confirm("هل أنت متأكد من رغبتك في الخروج؟")) {
+            location.reload();
         }
     }
 
-    function logout() { location.reload(); }
-
-    let staffData = JSON.parse(localStorage.getItem('myStaffList')) || {
-        "القطاع": [{n: "علي عبدالكريم حسين", p: "07705122140"}, {n: "احمد علي هزاع", p: "07708504330"}, {n: "مؤيد انور علي", p: "07702307824"}, {n: "محمد اصغر شريف", p: "07705119671"}],
-        "داقوق": [{n: "سليم طه بزون", p: "07704307475"}, {n: "جمعة احمد علاوي", p: "07706671144"}, {n: "خنكار رضا قادر", p: "07748193844"}],
-        "تازة": [{n: "عماد حسن حسين", p: "07701231951"}, {n: "مكرم شاكر صالح", p: "07738321128"}, {n: "غريب عبدالله علي", p: "07738321108"}, {n: "عقيل حمدي خورشيد", p: "07719849187"}],
-        "ليلان": [{n: "محمد داود طعمة", p: "07702365033"}, {n: "هشام كريم علي", p: "07706668042"}, {n: "شعبان خلف طعمة", p: "07735876486"}],
-        "الرشاد": [{n: "زياد خلف حسن", p: "07705032908"}, {n: "عبدالستار احمد صالح", p: "07704914902"}],
-        "مناوب الحراس": [{n: "كاظم اسماعيل", p: "07701074918"}, {n: "عقيل اصغر", p: "07701274082"}, {n: "احمد نورالدين", p: "07708592190"}]
-    };
-
-    function startIntervals() {
-        render();
+    function initClock() {
         setInterval(() => {
             const now = new Date();
-            document.getElementById('clock').innerText = now.toLocaleTimeString('ar-EG');
+            const dateStr = now.toLocaleDateString('ar-EG', {day:'2-digit', month:'2-digit', year:'numeric'});
+            document.getElementById('live-date').innerText = dateStr;
+            document.getElementById('live-date-st').innerText = dateStr;
+            document.getElementById('live-clock').innerText = now.toLocaleTimeString('ar-EG');
+
+            // حساب الوقت المتبقي للساعة 8 صباحاً
             let nextShift = new Date();
             nextShift.setHours(8, 0, 0, 0);
             if (now.getHours() >= 8) nextShift.setDate(nextShift.getDate() + 1);
+            
             let diff = nextShift - now;
-            let h = Math.floor(diff / 3600000), m = Math.floor((diff % 3600000) / 60000), s = Math.floor((diff % 60000) / 1000);
-            document.getElementById('countdown').innerText = `المتبقي للتبديل القادم: ${h}س ${m}د ${s}ث`;
-            if (h === 0 && m === 0 && s === 0) render();
+            let h = Math.floor(diff / 3600000);
+            let m = Math.floor((diff % 3600000) / 60000);
+            let s = Math.floor((diff % 60000) / 1000);
+            
+            const timerStr = `المتبقي للوجبة القادمة: ${h}س ${m}د ${s}ث`;
+            document.getElementById('countdown-timer').innerText = timerStr;
+            document.getElementById('countdown-timer-st').innerText = timerStr;
+
+            if(h==0 && m==0 && s==0) renderShifts();
         }, 1000);
     }
 
-    function render() {
-        const now = new Date();
-        const adjustedNow = new Date(now.getTime() - (8 * 60 * 60 * 1000));
-        // التاريخ المرجعي 8 مارس لضبط التوقيت كما اتفقنا
-        const refDate = new Date(2026, 2, 8); 
-        const dayDiff = Math.floor((adjustedNow - refDate) / 86400000);
+    function getShiftIndex(center, targetDate) {
+        // تعديل التاريخ ليكون المرجع هو الساعة 8 صباحاً
+        const adjustedDate = new Date(targetDate);
+        if (adjustedDate.getHours() < 8) adjustedDate.setDate(adjustedDate.getDate() - 1);
         
-        document.getElementById('today-date').innerText = now.toLocaleDateString('ar-EG', {dateStyle: 'full'});
+        const diffTime = Math.abs(adjustedDate - REFERENCE_DATE);
+        const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
         
-        let html = '';
-        for (let center in staffData) {
-            let list = staffData[center];
-            let idx = (center === "ليلان" || center === "الرشاد") ? Math.floor(dayDiff / 2) % list.length : dayDiff % list.length;
-            
-            html += `<div class="card" data-center="${center}">
-                <h3>📍 ${center}</h3>
-                <select onchange="updateList('${center}', this.value, ${idx})">
-                    ${list.map((item, i) => `<option value="${item.n}" ${i == idx ? 'selected' : ''}>👤 ${item.n}</option>`).join('')}
-                </select>
-                <div class="phone-box">📞 هاتف: ${list[idx].p}</div>
-            </div>`;
+        const list = staffData[center];
+        if (center === "صيانة ليلان" || center === "صيانة الرشاد") {
+            return Math.floor(diffDays / 2) % list.length;
         }
-        document.getElementById('app').innerHTML = html;
+        return diffDays % list.length;
     }
 
-    function updateList(center, newName, currentIndex) {
-        let list = staffData[center];
-        let newIdx = list.findIndex(item => item.n === newName);
-        let temp = list[currentIndex];
-        list[currentIndex] = list[newIdx];
-        list[newIdx] = temp;
-        localStorage.setItem('myStaffList', JSON.stringify(staffData));
-        render();
+    function renderShifts() {
+        let html = '';
+        const now = new Date();
+        for (let center in staffData) {
+            let idx = getShiftIndex(center, now);
+            let person = staffData[center][idx];
+            html += `
+                <div class="shift-card">
+                    <div>
+                        <div style="font-size:0.8rem; color:#7f8c8d">${center}</div>
+                        <div style="font-weight:bold; color:var(--primary)">${person.n}</div>
+                        <div style="font-size:0.9rem; color:var(--accent)">📞 ${person.p}</div>
+                    </div>
+                    <div style="font-size:1.5rem">👤</div>
+                </div>`;
+        }
+        document.getElementById('sector-list').innerHTML = html;
+
+        // توليد واجهة المحطات (فارغة حالياً)
+        let stHtml = '';
+        stations.forEach(st => {
+            stHtml += `
+                <div class="shift-card" style="border-right-color:#95a5a6">
+                    <div>
+                        <div style="font-weight:bold">${st}</div>
+                        <div style="font-size:0.8rem; color:#e74c3c">لا توجد بيانات حالياً</div>
+                    </div>
+                </div>`;
+        });
+        document.getElementById('station-list').innerHTML = stHtml;
+    }
+
+    // نظام الـ PWA - زر التثبيت
+    let deferredPrompt;
+    window.addEventListener('beforeinstallprompt', (e) => {
+        e.preventDefault();
+        deferredPrompt = e;
+        document.getElementById('install-btn').style.display = 'block';
+    });
+
+    document.getElementById('install-btn').addEventListener('click', async () => {
+        if (deferredPrompt) {
+            deferredPrompt.prompt();
+            const { outcome } = await deferredPrompt.userChoice;
+            if (outcome === 'accepted') document.getElementById('install-btn').style.display = 'none';
+            deferredPrompt = null;
+        }
+    });
+
+    // توليد تقرير PDF
+    function generatePDF() {
+        const { jsPDF } = window.jspdf;
+        const doc = new jsPDF('p', 'pt', 'a4');
+        
+        const start = new Date(document.getElementById('date-from').value);
+        const end = new Date(document.getElementById('date-to').value);
+
+        if (!start || !end || isNaN(start)) { alert("يرجى اختيار التاريخ"); return; }
+
+        let rows = [];
+        let curr = new Date(start);
+        let i = 1;
+
+        while (curr <= end) {
+            rows.push([
+                i++,
+                curr.toLocaleDateString('ar-EG'),
+                staffData["القطاع"][getShiftIndex("القطاع", curr)].n,
+                staffData["صيانة داقوق"][getShiftIndex("صيانة داقوق", curr)].n,
+                staffData["صيانة تازة"][getShiftIndex("صيانة تازة", curr)].n,
+                staffData["صيانة ليلان"][getShiftIndex("صيانة ليلان", curr)].n,
+                staffData["صيانة الرشاد"][getShiftIndex("صيانة الرشاد", curr)].n,
+                staffData["حراس القطاع"][getShiftIndex("حراس القطاع", curr)].n
+            ]);
+            curr.setDate(curr.getDate() + 1);
+        }
+
+        doc.addFont('https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.66/fonts/Roboto/Roboto-Regular.ttf', 'Roboto', 'normal');
+        doc.setFont('Roboto');
+        
+        doc.text("تقرير جدول المناوبات - قطاع داقوق", 400, 30, { align: 'right' });
+        
+        doc.autoTable({
+            head: [['ت', 'التاريخ', 'القطاع', 'داقوق', 'تازة', 'ليلان', 'الرشاد', 'الحارس']],
+            body: rows,
+            styles: { font: 'Roboto', halign: 'right' },
+            headStyles: { fillColor: [44, 62, 80] }
+        });
+
+        doc.save(`تقرير_المناوبات_${new Date().toLocaleDateString()}.pdf`);
     }
 </script>
 </body>
