@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>نظام داقوق الرقمي 2026</title>
+    <title>نظام مناوبات قطاع داقوق الرقمي 2026</title>
     <style>
         :root {
             --main-bg: #0f172a;
@@ -46,17 +46,6 @@
         .shift-card { background: var(--card-bg); padding: 15px; border-radius: 20px; margin-bottom: 10px; border-right: 6px solid var(--accent-blue); }
 
         input[type="date"] { width: 100%; padding: 12px; margin: 10px 0; border-radius: 10px; background: #1e293b; color: white; border: 1px solid #334155; }
-
-        /* تنسيق الطباعة السحري */
-        @media print {
-            body * { visibility: hidden; }
-            #print-area, #print-area * { visibility: visible; color: black !important; }
-            #print-area { position: absolute; left: 0; top: 0; width: 100%; direction: rtl; }
-            table { width: 100%; border-collapse: collapse; margin-top: 20px; }
-            th, td { border: 1px solid #ddd; padding: 8px; text-align: center; font-size: 10px; }
-            th { background-color: #f2f2f2 !important; }
-            .no-print { display: none; }
-        }
     </style>
     <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
 </head>
@@ -67,8 +56,8 @@
     </div>
 
     <div id="login-screen">
-        <h1 style="margin:0">وزارة الكهرباء</h1>
-        <p style="opacity:0.7">قطاع داقوق - نظام المناوبات</p>
+        <h1 style="margin:0">وزارة الكهرباء العراقية</h1>
+        <p style="opacity:0.7">توزيع الشمال|قطاع داقوق - نظام المناوبات الرقمي</p>
         <div style="margin: 30px 0;"><button class="enter-btn" onclick="startApp()">دخول</button></div>
         <div style="font-size:0.8rem; color:var(--accent-blue)">م. محمد سهران خورشيد © 2026</div>
     </div>
@@ -98,26 +87,7 @@
             <h3 style="text-align:center">توليد تقرير المناوبات</h3>
             <label>من تاريخ:</label><input type="date" id="report-start">
             <label>إلى تاريخ:</label><input type="date" id="report-end">
-            <button class="enter-btn" style="width:100%; margin-top:15px;" onclick="prepareReport()">توليد ومعاينة الطباعة</button>
-        </div>
-        <div id="print-area" style="display:none;">
-            <h2 style="text-align:center">سجل مناوبات قطاع كهرباء داقوق لعام 2026</h2>
-            <p id="print-range" style="text-align:center"></p>
-            <table id="report-table">
-                <thead>
-                    <tr>
-                        <th>التاريخ</th>
-                        <th>القطاع</th>
-                        <th>صيانة داقوق</th>
-                        <th>صيانة تازة</th>
-                        <th>صيانة ليلان</th>
-                        <th>صيانة الرشاد</th>
-                        <th>حراس القطاع</th>
-                    </tr>
-                </thead>
-                <tbody id="report-body"></tbody>
-            </table>
-            <p style="margin-top:20px; font-size:10px;">طبع بواسطة نظام المناوبات الذكي - م. محمد سهران خورشيد</p>
+            <button class="enter-btn" style="width:100%; margin-top:15px;" onclick="generatePrintWindow()">طبع الجدول الآن</button>
         </div>
     </div>
 
@@ -131,11 +101,11 @@
 
     const staffData = {
         "القطاع": { type: "daily", list: [{n: "احمد علي هزاع", p: "07708504330"}, {n: "مؤيد انور علي", p: "07702307824"}, {n: "محمد أصغر شريف", p: "07705119671"}, {n: "علي عبدالكريم حسين", p: "07705122140"}]},
-        "داقوق": { type: "daily", list: [{n: "جمعة احمد علاوي", p: "07706671144"}, {n: "خنكار رضا قادر", p: "07748193844"}, {n: "سليم طه بزون", p: "07704307475"}]},
-        "تازة": { type: "daily", list: [{n: "مكرم شاكر صالح", p: "07738321128"}, {n: "غريب عبدالله علي", p: "07738321108"}, {n: "عقيل حمدي خورشيد", p: "07719849187"}, {n: "عماد حسن حسين", p: "07701231951"}]},
-        "ليلان": { type: "two-day", list: [{n: "محمد داود طعمة", p: "07702365033"}, {n: "هشام كريم علي", p: "07706668042"}, {n: "شعبان خلف طعمة", p: "07735876486"}]},
-        "الرشاد": { type: "two-day", list: [{n: "زياد خلف حسن", p: "07705032908"}, {n: "عبدالستار احمد صالح", p: "07704914902"}]},
-        "الحراس": { type: "daily", list: [{n: "احمد نورالدين", p: "07708592190"}, {n: "كاظم اسماعيل", p: "07701074918"}, {n: "عقيل أصغر", p: "07701274082"}]}
+        "صيانة داقوق": { type: "daily", list: [{n: "جمعة احمد علاوي", p: "07706671144"}, {n: "خنكار رضا قادر", p: "07748193844"}, {n: "سليم طه بزون", p: "07704307475"}]},
+        "صيانة تازة": { type: "daily", list: [{n: "مكرم شاكر صالح", p: "07738321128"}, {n: "غريب عبدالله علي", p: "07738321108"}, {n: "عقيل حمدي خورشيد", p: "07719849187"}, {n: "عماد حسن حسين", p: "07701231951"}]},
+        "صيانة ليلان": { type: "two-day", list: [{n: "محمد داود طعمة", p: "07702365033"}, {n: "هشام كريم علي", p: "07706668042"}, {n: "شعبان خلف طعمة", p: "07735876486"}]},
+        "صيانة الرشاد": { type: "two-day", list: [{n: "زياد خلف حسن", p: "07705032908"}, {n: "عبدالستار احمد صالح", p: "07704914902"}]},
+        "حراس القطاع": { type: "daily", list: [{n: "احمد نورالدين", p: "07708592190"}, {n: "كاظم اسماعيل", p: "07701074918"}, {n: "عقيل أصغر", p: "07701274082"}]}
     };
 
     function startApp() { document.getElementById('login-screen').style.display = 'none'; document.getElementById('main-dashboard').style.display = 'flex'; runClock(); renderSector(); }
@@ -172,32 +142,65 @@
     function openPage(id) { document.getElementById(id).style.display = 'flex'; }
     function closePage() { document.querySelectorAll('.sub-page').forEach(p=>p.style.display='none'); }
 
-    function prepareReport() {
+    // الحل الجديد: فتح نافذة جديدة للطباعة لضمان ظهور البيانات
+    function generatePrintWindow() {
         const sStr = document.getElementById('report-start').value;
         const eStr = document.getElementById('report-end').value;
         if(!sStr || !eStr) return alert("اختر التاريخ");
 
         const start = new Date(sStr); const end = new Date(eStr);
-        document.getElementById('print-range').innerText = `للفترة من ${sStr} إلى ${eStr}`;
-        
-        let html = '';
+        let tableRows = '';
         let curr = new Date(start); curr.setHours(9,0,0);
+        
         while(curr <= end) {
-            html += `<tr>
+            tableRows += `<tr>
                 <td>${curr.toLocaleDateString('ar-EG')}</td>
                 <td>${staffData["القطاع"].list[getIdx("القطاع", curr)].n}</td>
-                <td>${staffData["داقوق"].list[getIdx("داقوق", curr)].n}</td>
-                <td>${staffData["تازة"].list[getIdx("تازة", curr)].n}</td>
-                <td>${staffData["ليلان"].list[getIdx("ليلان", curr)].n}</td>
-                <td>${staffData["الرشاد"].list[getIdx("الرشاد", curr)].n}</td>
-                <td>${staffData["الحراس"].list[getIdx("الحراس", curr)].n}</td>
+                <td>${staffData["صيانة داقوق"].list[getIdx("صيانة داقوق", curr)].n}</td>
+                <td>${staffData["صيانة تازة"].list[getIdx("صيانة تازة", curr)].n}</td>
+                <td>${staffData["صيانة ليلان"].list[getIdx("صيانة ليلان", curr)].n}</td>
+                <td>${staffData["صيانة الرشاد"].list[getIdx("صيانة الرشاد", curr)].n}</td>
+                <td>${staffData["حراس القطاع"].list[getIdx("حراس القطاع", curr)].n}</td>
             </tr>`;
             curr.setDate(curr.getDate()+1);
         }
-        document.getElementById('report-body').innerHTML = html;
-        document.getElementById('print-area').style.display = 'block';
-        window.print();
-        setTimeout(() => { document.getElementById('print-area').style.display = 'none'; }, 1000);
+
+        const printWindow = window.open('', '_blank');
+        printWindow.document.write(`
+            <html dir="rtl" lang="ar">
+            <head>
+                <title>طباعة تقرير المناوبات</title>
+                <style>
+                    body { font-family: 'Segoe UI', Tahoma, sans-serif; padding: 20px; }
+                    h2, p { text-align: center; }
+                    table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+                    th, td { border: 1px solid black; padding: 8px; text-align: center; font-size: 12px; }
+                    th { background-color: #f2f2f2; }
+                </style>
+            </head>
+            <body>
+                <h2>سجل مناوبات قطاع كهرباء داقوق لعام 2026</h2>
+                <p>للفترة من ${sStr} إلى ${eStr}</p>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>التاريخ</th>
+                            <th>القطاع</th>
+                            <th>صيانة داقوق</th>
+                            <th>صيانة تازة</th>
+                            <th>صيانة ليلان</th>
+                            <th>صيانة الرشاد</th>
+                            <th>حراس القطاع</th>
+                        </tr>
+                    </thead>
+                    <tbody>${tableRows}</tbody>
+                </table>
+                <p style="margin-top:30px; font-size:10px;">طبع بواسطة نظام المناوبات الذكي - م. محمد سهران خورشيد</p>
+                <script>window.onload = function() { window.print(); window.close(); };<\/script>
+            </body>
+            </html>
+        `);
+        printWindow.document.close();
     }
 
     let dwP; window.addEventListener('beforeinstallprompt', (e) => { e.preventDefault(); dwP = e; document.getElementById('install-bar').style.display = 'flex'; });
