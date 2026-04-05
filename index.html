@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>نظام مناوبات قطاع داقوق الرقمي 2026</title>
+    <title>نظام مناوبات داقوق الرقمي 2026</title>
     
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#10141d">
@@ -28,51 +28,59 @@
         .neu-inset { box-shadow: inset 2px 2px 5px rgba(0,0,0,0.5), inset -2px -2px 5px rgba(255,255,255,0.05); }
         .neu-outset { box-shadow: 3px 3px 7px rgba(0,0,0,0.5), -1px -1px 3px rgba(255,255,255,0.03); }
 
+        /* واجهة الدخول */
         #login-screen { position: fixed; inset: 0; background: var(--bg-color); display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 1000; }
         .login-card { background: var(--card-bg); padding: 40px 30px; border-radius: 30px; text-align: center; width: 88%; max-width: 400px; box-shadow: 10px 10px 20px rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.03); }
 
-        .btn-main { background: var(--grad-blue); color: white; border: none; padding: 15px 40px; border-radius: 15px; font-size: 1.1rem; font-weight: bold; cursor: pointer; display: inline-flex; align-items: center; gap: 10px; box-shadow: 0 5px 15px rgba(37, 99, 235, 0.4); }
+        .btn-main { background: var(--grad-blue); color: white; border: none; padding: 15px 40px; border-radius: 15px; font-size: 1.1rem; font-weight: bold; cursor: pointer; display: inline-flex; align-items: center; gap: 10px; box-shadow: 0 5px 15px rgba(37, 99, 235, 0.4); text-decoration: none; }
 
+        /* الصفحة الرئيسية */
         #main-dashboard { display: none; height: 100vh; flex-direction: column; padding: 20px; overflow-y: auto; }
         .header-section { text-align: center; margin-bottom: 25px; }
         #clock-label { font-size: 2.8rem; font-weight: 300; color: #fff; text-shadow: var(--glow-blue); background: var(--card-bg); display: inline-block; padding: 10px 25px; border-radius: 20px; box-shadow: var(--neu-inset); }
         #date-label { color: var(--accent-gold); font-size: 1rem; margin-top: 15px; font-weight: 500; }
 
-        /* زر التثبيت PWA */
-        #install-pwa-btn { display: none; margin: 10px auto; background: #1e293b; color: var(--accent-gold); border: 1px solid var(--accent-gold); padding: 8px 20px; border-radius: 10px; font-size: 0.85rem; cursor: pointer; align-items: center; gap: 8px; box-shadow: var(--neu-outset); }
-
+        /* شبكة الأزرار */
         .menu-grid { display: grid; grid-template-columns: repeat(2, 1fr); grid-gap: 15px; margin-bottom: 25px; }
-        .menu-item { background: var(--card-bg); border-radius: 20px; padding: 20px; color: var(--text-main); display: flex; flex-direction: column; align-items: center; gap: 10px; cursor: pointer; box-shadow: var(--neu-outset); }
+        .menu-item { background: var(--card-bg); border-radius: 20px; padding: 20px; color: var(--text-main); display: flex; flex-direction: column; align-items: center; gap: 10px; cursor: pointer; box-shadow: var(--neu-outset); border: 1px solid transparent; transition: 0.2s; }
         .menu-item i { font-size: 2rem; color: #38bdf8; }
+        .menu-item span { font-size: 0.9rem; font-weight: 500; color: var(--text-muted); }
 
+        /* بطاقات المناوبات */
         .section-title { font-size: 1.1rem; color: var(--accent-gold); margin: 20px 0 15px 5px; font-weight: 500; }
-        .cards-container { display: flex; flex-direction: column; gap: 12px; padding-bottom: 30px; }
-
+        .cards-container { display: flex; flex-direction: column; gap: 12px; padding-bottom: 20px; }
         .shift-card { background: var(--card-bg); border-radius: 18px; padding: 15px 20px; display: flex; justify-content: space-between; align-items: center; box-shadow: var(--neu-outset); border-right: 5px solid #38bdf8; }
         .card-info h4 { margin: 0; font-size: 0.8rem; color: var(--text-muted); }
         .card-info p { margin: 5px 0 0; font-size: 1.1rem; font-weight: 600; }
+        .card-action a { color: #38bdf8; background: rgba(56, 189, 248, 0.1); width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: var(--neu-inset); }
 
-        .card-action a { color: #38bdf8; background: rgba(56, 189, 248, 0.1); width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: var(--neu-inset); text-decoration: none; }
+        /* العداد الزمني */
+        .timer-box { background: var(--card-bg); padding: 15px; border-radius: 20px; box-shadow: var(--neu-inset); text-align: center; margin-top: 10px; border: 1px solid rgba(251, 191, 36, 0.1); }
+        .timer-text { color: var(--accent-gold); font-size: 0.9rem; font-weight: 600; }
 
-        /* حاوية العداد الزمني المتبقي */
-        .timer-box { background: var(--card-bg); padding: 15px; border-radius: 20px; box-shadow: var(--neu-inset); text-align: center; margin-top: 10px; border: 1px solid rgba(251, 191, 36, 0.2); }
-        .timer-text { color: var(--accent-gold); font-size: 0.95rem; font-weight: 600; text-shadow: 0 0 8px rgba(251, 191, 36, 0.3); }
-
+        /* النوافذ الفرعية */
         .sub-page { position: fixed; inset: 0; background: var(--bg-color); z-index: 500; display: none; flex-direction: column; padding: 20px; }
-        .page-header { display: flex; align-items: center; gap: 15px; margin-bottom: 20px; }
-        .back-circle { background: var(--card-bg); width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: var(--neu-outset); color: #38bdf8; }
+        .page-header { display: flex; align-items: center; gap: 15px; margin-bottom: 25px; }
+        .back-circle { background: var(--card-bg); width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: var(--neu-outset); color: #38bdf8; cursor: pointer; }
+
+        #install-row { display: none; margin-bottom: 15px; justify-content: center; }
+        .install-btn { background: #1e293b; color: var(--accent-gold); border: 1px solid var(--accent-gold); padding: 8px 15px; border-radius: 10px; font-size: 0.8rem; cursor: pointer; display: flex; align-items: center; gap: 8px; }
     </style>
 </head>
 <body>
 
     <div id="login-screen">
         <div class="login-card">
-            <i class="material-icons" style="font-size: 4.5rem; color: #38bdf8;">bolt</i>
+            <i class="material-icons" style="font-size: 4.5rem; color: #38bdf8; text-shadow: var(--glow-blue);">bolt</i>
             <h1 style="margin: 15px 0 5px;">وزارة الكهرباء العراقية</h1>
             <p style="color: var(--text-muted); margin-bottom: 30px;">توزيع كهرباء الشمال | قطاع داقوق - النظام الرقمي</p>
-            <button class="btn-main" onclick="startApp()">دخول النظام<i class="material-icons">login</i></button>
-            <button id="install-pwa-btn"><i class="material-icons">install_mobile</i> تثبيت التطبيق على الهاتف</button>
-            <p style="margin-top: 25px; font-size: 0.7rem; color: var(--accent-gold);">فكرة وتصميم: م. محمد سهران خورشيد © 2026</p>
+            
+            <div id="install-row">
+                <button class="install-btn" onclick="triggerInstall()"><i class="material-icons">install_mobile</i> تثبيت التطبيق</button>
+            </div>
+
+            <button class="btn-main" onclick="startApp()">دخول النظام <i class="material-icons">login</i></button>
+            <p style="margin-top: 25px; font-size: 0.7rem; color: var(--accent-gold);">فكرة وتصميم: م. محمد سهران خورشيد جميع الحقوق محفوظة © 2026</p>
         </div>
     </div>
 
@@ -91,25 +99,48 @@
                 <i class="material-icons">account_tree</i>
                 <span>المحطات</span>
             </div>
+            <div class="menu-item" onclick="alert('سيتم إضافة التعليمات قريباً')">
+                <i class="material-icons">info_outline</i>
+                <span>التعليمات</span>
+            </div>
+            <div class="menu-item" style="border: 1px solid #ef444444" onclick="location.reload()">
+                <i class="material-icons" style="color:#ef4444">power_settings_new</i>
+                <span>خروج</span>
+            </div>
         </div>
 
         <div class="section-title"><i class="material-icons" style="font-size:1.2rem; vertical-align:middle">groups</i> الوجبة الحالية</div>
         <div id="cards-list" class="cards-container"></div>
         
         <div class="timer-box">
-            <div id="time-remaining" class="timer-text">تبديل الوجبة خلال: --:--:--</div>
+            <div id="time-remaining" class="timer-text">تحميل العداد...</div>
         </div>
     </div>
 
     <div id="page-report" class="sub-page">
         <div class="page-header">
             <div class="back-circle" onclick="closePage()"><i class="material-icons">arrow_forward</i></div>
-            <h2 style="font-size: 1.1rem;">تصدير سجل Excel</h2>
+            <h2 style="font-size: 1.1rem; margin:0;">تصدير سجل Excel</h2>
         </div>
-        <div style="background:var(--card-bg); padding:20px; border-radius:20px; box-shadow:var(--neu-inset)">
-            <input type="date" id="report-start" style="width:100%; padding:12px; margin-bottom:15px; background:#0d1117; color:white; border:none; border-radius:10px;">
-            <input type="date" id="report-end" style="width:100%; padding:12px; margin-bottom:15px; background:#0d1117; color:white; border:none; border-radius:10px;">
+        <div class="neu-inset" style="background:var(--card-bg); padding:25px; border-radius:25px;">
+            <label style="display:block; margin-bottom:8px; font-size:0.8rem; color:#38bdf8">من تاريخ:</label>
+            <input type="date" id="report-start" style="width:100%; padding:15px; margin-bottom:20px; background:#0d1117; color:white; border:none; border-radius:12px; outline:none">
+            
+            <label style="display:block; margin-bottom:8px; font-size:0.8rem; color:#38bdf8">إلى تاريخ:</label>
+            <input type="date" id="report-end" style="width:100%; padding:15px; margin-bottom:25px; background:#0d1117; color:white; border:none; border-radius:12px; outline:none">
+            
             <button class="btn-main" style="width:100%; justify-content:center" onclick="confirmAndExport()">تصدير الجدول (RTL)</button>
+        </div>
+    </div>
+
+    <div id="page-stations" class="sub-page">
+        <div class="page-header">
+            <div class="back-circle" onclick="closePage()"><i class="material-icons">arrow_forward</i></div>
+            <h2 style="font-size: 1.1rem; margin:0;">مناوبي المحطات</h2>
+        </div>
+        <div style="text-align:center; padding-top:50px; opacity:0.5">
+            <i class="material-icons" style="font-size:4rem">construction</i>
+            <p>قيد التحديث...</p>
         </div>
     </div>
 
@@ -117,13 +148,14 @@
     const START_REF = new Date(2026, 3, 5, 8, 0, 0); 
     let deferredPrompt;
 
+    // البيانات الكاملة
     const staffData = {
-        "مناوب مركز القطاع": { color: "#38bdf8", type: "daily", list: [{n: "مؤيد انور علي", p: "07702307824"}, {n: "احمد علي هزاع", p: "07708504330"}]},
-        "صيانة داقوق": { color: "#fb923c", type: "daily", list: [{n: "خنكار رضا قادر", p: "07748193844"}, {n: "جمعة احمد علاوي", p: "07706671144"}]},
-        "صيانة تازة": { color: "#c084fc", type: "daily", list: [{n: "غريب عبدالله علي", p: "07738321108"}, {n: "مكرم شاكر صالح", p: "07738321128"}]},
-        "صيانة ليلان (يومين)": { color: "#f87171", type: "two-day", list: [{n: "محمد داود طعمة", p: "07702365033"}]},
-        "صيانة الرشاد (يومين)": { color: "#4adede", type: "two-day", list: [{n: "زياد خلف حسن", p: "07705032908"}]},
-        "حراس القطاع": { color: "#10b981", type: "daily", list: [{n: "كاظم اسماعيل", p: "07701074918"}]}
+        "مناوب مركز القطاع": { color: "#38bdf8", type: "daily", list: [{n: "مؤيد انور علي", p: "07702307824"}, {n: "احمد علي هزاع", p: "07708504330"}, {n: "محمد أصغر شريف", p: "07705119671"}, {n: "علي عبدالكريم حسين", p: "07705122140"}]},
+        "صيانة داقوق": { color: "#fb923c", type: "daily", list: [{n: "خنكار رضا قادر", p: "07748193844"}, {n: "جمعة احمد علاوي", p: "07706671144"}, {n: "سليم طه بزون", p: "07704307475"}]},
+        "صيانة تازة": { color: "#c084fc", type: "daily", list: [{n: "غريب عبدالله علي", p: "07738321108"}, {n: "مكرم شاكر صالح", p: "07738321128"}, {n: "عقيل حمدي خورشيد", p: "07719849187"}, {n: "عماد حسن حسين", p: "07701231951"}]},
+        "صيانة ليلان (يومين)": { color: "#f87171", type: "two-day", list: [{n: "محمد داود طعمة", p: "07702365033"}, {n: "هشام كريم علي", p: "07706668042"}, {n: "شعبان خلف طعمة", p: "07735876486"}]},
+        "صيانة الرشاد (يومين)": { color: "#4adede", type: "two-day", list: [{n: "زياد خلف حسن", p: "07705032908"}, {n: "عبدالستار احمد صالح", p: "07704914902"}]},
+        "حراس القطاع": { color: "#10b981", type: "daily", list: [{n: "كاظم اسماعيل", p: "07701074918"}, {n: "احمد نورالدين", p: "07708592190"}, {n: "عقيل أصغر", p: "07701274082"}]}
     };
 
     function startApp() { document.getElementById('login-screen').style.display='none'; document.getElementById('main-dashboard').style.display='flex'; runClock(); renderCards(); }
@@ -134,16 +166,10 @@
             document.getElementById('clock-label').innerText = now.toLocaleTimeString('ar-EG');
             document.getElementById('date-label').innerText = now.toLocaleDateString('ar-EG', {weekday:'long', day:'numeric', month:'long'});
             
-            // حساب الوقت المتبقي للمناوبة القادمة (الساعة 8 صباحاً)
-            let nextShift = new Date();
-            nextShift.setHours(8, 0, 0, 0);
+            let nextShift = new Date(); nextShift.setHours(8, 0, 0, 0);
             if (now.getHours() >= 8) nextShift.setDate(nextShift.getDate() + 1);
-            
             let diff = nextShift - now;
-            let h = Math.floor(diff / 3600000);
-            let m = Math.floor((diff % 3600000) / 60000);
-            let s = Math.floor((diff % 60000) / 1000);
-            
+            let h = Math.floor(diff / 3600000), m = Math.floor((diff % 3600000) / 60000), s = Math.floor((diff % 60000) / 1000);
             document.getElementById('time-remaining').innerText = `تبديل الوجبة خلال: ${h} س و ${m} د و ${s} ث`;
         }, 1000);
     }
@@ -170,44 +196,63 @@
     function openPage(id) { document.getElementById(id).style.display = 'flex'; }
     function closePage() { document.querySelectorAll('.sub-page').forEach(p=>p.style.display='none'); }
 
-    // معالج تثبيت التطبيق PWA
+    // إصلاح محتوى ملف Excel وتصديره بالكامل
+    function confirmAndExport() {
+        const sStr = document.getElementById('report-start').value;
+        const eStr = document.getElementById('report-end').value;
+        if(!sStr || !eStr) return alert("يرجى اختيار التاريخ");
+
+        if(confirm(`سيتم استخراج جدول المناوبات للفترة من ${sStr} إلى ${eStr}`)) {
+            const start = new Date(sStr); const end = new Date(eStr);
+            const rows = [];
+            const headers = ["التاريخ", "اليوم", "مناوب مركز القطاع", "صيانة داقوق", "صيانة تازة", "صيانة ليلان", "صيانة الرشاد", "حراس القطاع"];
+            rows.push(headers);
+
+            let curr = new Date(start); curr.setHours(9,0,0);
+            while(curr <= end) {
+                rows.push([
+                    curr.toLocaleDateString('ar-EG'),
+                    curr.toLocaleDateString('ar-EG', {weekday:'long'}),
+                    staffData["مناوب مركز القطاع"].list[getIdx("مناوب مركز القطاع", curr)].n,
+                    staffData["صيانة داقوق"].list[getIdx("صيانة داقوق", curr)].n,
+                    staffData["صيانة تازة"].list[getIdx("صيانة تازة", curr)].n,
+                    staffData["صيانة ليلان (يومين)"].list[getIdx("صيانة ليلان (يومين)", curr)].n,
+                    staffData["صيانة الرشاد (يومين)"].list[getIdx("صيانة الرشاد (يومين)", curr)].n,
+                    staffData["حراس القطاع"].list[getIdx("حراس القطاع", curr)].n
+                ]);
+                curr.setDate(curr.getDate()+1);
+            }
+
+            const wb = XLSX.utils.book_new();
+            const ws = XLSX.utils.aoa_to_sheet(rows);
+            if(!ws['!views']) ws['!views'] = [{}];
+            ws['!views'][0].rightToLeft = true; // اتجاه اليمين لليسار
+            
+            XLSX.utils.book_append_sheet(wb, ws, "المناوبات");
+            XLSX.writeFile(wb, `Kirkuk_Shifts_${sStr}.xlsx`);
+        }
+    }
+
+    // منطق الـ PWA
     window.addEventListener('beforeinstallprompt', (e) => {
         e.preventDefault();
         deferredPrompt = e;
-        document.getElementById('install-pwa-btn').style.display = 'flex';
+        document.getElementById('install-row').style.display = 'flex';
     });
 
-    document.getElementById('install-pwa-btn').addEventListener('click', async () => {
+    async function triggerInstall() {
         if (deferredPrompt) {
             deferredPrompt.prompt();
             const { outcome } = await deferredPrompt.userChoice;
-            if (outcome === 'accepted') {
-                document.getElementById('install-pwa-btn').style.display = 'none';
-            }
+            if (outcome === 'accepted') document.getElementById('install-row').style.display = 'none';
             deferredPrompt = null;
         }
-    });
-
-    // تسجيل الـ Service Worker
-    if ('serviceWorker' in navigator) {
-        window.addEventListener('load', () => {
-            navigator.serviceWorker.register('sw.js').then(reg => console.log('SW Active'));
-        });
     }
 
-    function confirmAndExport() {
-        const s = document.getElementById('report-start').value;
-        const e = document.getElementById('report-end').value;
-        if(!s || !e) return alert("يرجى اختيار التاريخ");
-        if(confirm(`سيتم تصدير الجدول من (${s}) إلى (${e}) بصيغة Excel؟`)) {
-            // كود التصدير (نفس المنطق السابق مع الـ RTL)
-            const wb = XLSX.utils.book_new();
-            const ws = XLSX.utils.aoa_to_sheet([["التاريخ", "مناوب مركز القطاع"], [s, "اسم عشوائي"]]); 
-            if(!ws['!views']) ws['!views'] = [{}];
-            ws['!views'][0].rightToLeft = true;
-            XLSX.utils.book_append_sheet(wb, ws, "سجل المناوبات");
-            XLSX.writeFile(wb, `Shifts_${s}.xlsx`);
-        }
+    if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+            navigator.serviceWorker.register('sw.js').catch(err => console.log('SW Error', err));
+        });
     }
 </script>
 </body>
