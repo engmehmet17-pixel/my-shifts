@@ -144,24 +144,32 @@
         </div>
     </div>
 
-<script>
-    const START_REF = new Date(2026, 3, 5, 8, 0, 0); 
+ <script>
+    // تاريخ المرجع لبدء تدوير المناوبات (9 آذار 2026)
+    const START_REF = new Date(2026, 2, 9, 8, 0, 0);
     let deferredPrompt;
 
-    // البيانات الكاملة
+    // قاعدة البيانات المحدثة والمطابقة لواجهة العرض
     const staffData = {
-        "مناوب مركز القطاع": { color: "#38bdf8", type: "daily", list: [{n: "مؤيد انور علي", p: "07702307824"}, {n: "احمد علي هزاع", p: "07708504330"}, {n: "محمد أصغر شريف", p: "07705119671"}, {n: "علي عبدالكريم حسين", p: "07705122140"}]},
+        "القطاع المركزي": { color: "#38bdf8", type: "daily", list: [{n: "مؤيد انور علي", p: "07702307824"}, {n: "احمد علي هزاع", p: "07708504330"}, {n: "محمد أصغر شريف", p: "07705119671"}, {n: "علي عبدالكريم حسين", p: "07705122140"}]},
         "صيانة داقوق": { color: "#fb923c", type: "daily", list: [{n: "خنكار رضا قادر", p: "07748193844"}, {n: "جمعة احمد علاوي", p: "07706671144"}, {n: "سليم طه بزون", p: "07704307475"}]},
         "صيانة تازة": { color: "#c084fc", type: "daily", list: [{n: "غريب عبدالله علي", p: "07738321108"}, {n: "مكرم شاكر صالح", p: "07738321128"}, {n: "عقيل حمدي خورشيد", p: "07719849187"}, {n: "عماد حسن حسين", p: "07701231951"}]},
-        "صيانة ليلان (يومين)": { color: "#f87171", type: "two-day", list: [{n: "محمد داود طعمة", p: "07702365033"}, {n: "هشام كريم علي", p: "07706668042"}, {n: "شعبان خلف طعمة", p: "07735876486"}]},
-        "صيانة الرشاد (يومين)": { color: "#4adede", type: "two-day", list: [{n: "زياد خلف حسن", p: "07705032908"}, {n: "عبدالستار احمد صالح", p: "07704914902"}]},
+        "صيانة ليلان": { color: "#f87171", type: "two-day", list: [{n: "محمد داود طعمة", p: "07702365033"}, {n: "هشام كريم علي", p: "07706668042"}, {n: "شعبان خلف طعمة", p: "07735876486"}]},
+        "صيانة الرشاد": { color: "#4adede", type: "two-day", list: [{n: "زياد خلف حسن", p: "07705032908"}, {n: "عبدالستار احمد صالح", p: "07704914902"}]},
         "حراس القطاع": { color: "#10b981", type: "daily", list: [{n: "كاظم اسماعيل", p: "07701074918"}, {n: "احمد نورالدين", p: "07708592190"}, {n: "عقيل أصغر", p: "07701274082"}]}
     };
 
-    function startApp() { document.getElementById('login-screen').style.display='none'; document.getElementById('main-dashboard').style.display='flex'; runClock(); renderCards(); }
+    // تشغيل النظام عند الضغط على زر الدخول
+    function startApp() { 
+        document.getElementById('login-screen').style.display='none'; 
+        document.getElementById('main-dashboard').style.display='flex'; 
+        runClock(); 
+        renderCards(); // عرض البطاقات فوراً
+    }
 
+    // تحديث الساعة والعداد الزمني
     function runClock() {
-        setInterval(() => {
+        const update = () => {
             const now = new Date();
             document.getElementById('clock-label').innerText = now.toLocaleTimeString('ar-EG');
             document.getElementById('date-label').innerText = now.toLocaleDateString('ar-EG', {weekday:'long', day:'numeric', month:'long'});
@@ -171,16 +179,21 @@
             let diff = nextShift - now;
             let h = Math.floor(diff / 3600000), m = Math.floor((diff % 3600000) / 60000), s = Math.floor((diff % 60000) / 1000);
             document.getElementById('time-remaining').innerText = `تبديل الوجبة خلال: ${h} س و ${m} د و ${s} ث`;
-        }, 1000);
+        };
+        update(); setInterval(update, 1000);
     }
 
+    // حساب الفهرس (Index) بناءً على التاريخ
     function getIdx(key, date) {
-        const d = new Date(date); if(d.getHours() < 8) d.setDate(d.getDate()-1);
-        const diff = Math.floor((d - START_REF) / 86400000);
+        const d = new Date(date); 
+        if(d.getHours() < 8) d.setDate(d.getDate() - 1);
+        const diff = Math.floor((new Date(d).setHours(0,0,0,0) - new Date(START_REF).setHours(0,0,0,0)) / 86400000);
         const item = staffData[key];
-        return item.type === "two-day" ? Math.floor(diff/2) % item.list.length : diff % item.list.length;
+        let index = item.type === "two-day" ? Math.floor(diff/2) % item.list.length : diff % item.list.length;
+        return Math.abs(index); 
     }
 
+    // توليد بطاقات المناوبين برمجياً
     function renderCards() {
         let h = ''; const now = new Date();
         for(let k in staffData) {
@@ -193,50 +206,44 @@
         document.getElementById('cards-list').innerHTML = h;
     }
 
+    // التنقل بين الصفحات
     function openPage(id) { document.getElementById(id).style.display = 'flex'; }
     function closePage() { document.querySelectorAll('.sub-page').forEach(p=>p.style.display='none'); }
 
-    // إصلاح محتوى ملف Excel وتصديره بالكامل
+    // تصدير ملف Excel بنظام اليمين لليسار (RTL)
     function confirmAndExport() {
         const sStr = document.getElementById('report-start').value;
         const eStr = document.getElementById('report-end').value;
         if(!sStr || !eStr) return alert("يرجى اختيار التاريخ");
 
-        if(confirm(`سيتم استخراج جدول المناوبات للفترة من ${sStr} إلى ${eStr}`)) {
-            const start = new Date(sStr); const end = new Date(eStr);
-            const rows = [];
-            const headers = ["التاريخ", "اليوم", "مناوب مركز القطاع", "صيانة داقوق", "صيانة تازة", "صيانة ليلان", "صيانة الرشاد", "حراس القطاع"];
-            rows.push(headers);
+        const start = new Date(sStr); const end = new Date(eStr);
+        const rows = [["التاريخ", "اليوم", "القطاع المركزي", "صيانة داقوق", "صيانة تازة", "صيانة ليلان", "صيانة الرشاد", "حراس القطاع"]];
 
-            let curr = new Date(start); curr.setHours(9,0,0);
-            while(curr <= end) {
-                rows.push([
-                    curr.toLocaleDateString('ar-EG'),
-                    curr.toLocaleDateString('ar-EG', {weekday:'long'}),
-                    staffData["مناوب مركز القطاع"].list[getIdx("مناوب مركز القطاع", curr)].n,
-                    staffData["صيانة داقوق"].list[getIdx("صيانة داقوق", curr)].n,
-                    staffData["صيانة تازة"].list[getIdx("صيانة تازة", curr)].n,
-                    staffData["صيانة ليلان (يومين)"].list[getIdx("صيانة ليلان (يومين)", curr)].n,
-                    staffData["صيانة الرشاد (يومين)"].list[getIdx("صيانة الرشاد (يومين)", curr)].n,
-                    staffData["حراس القطاع"].list[getIdx("حراس القطاع", curr)].n
-                ]);
-                curr.setDate(curr.getDate()+1);
-            }
-
-            const wb = XLSX.utils.book_new();
-            const ws = XLSX.utils.aoa_to_sheet(rows);
-            if(!ws['!views']) ws['!views'] = [{}];
-            ws['!views'][0].rightToLeft = true; // اتجاه اليمين لليسار
-            
-            XLSX.utils.book_append_sheet(wb, ws, "المناوبات");
-            XLSX.writeFile(wb, `Kirkuk_Shifts_${sStr}.xlsx`);
+        let curr = new Date(start);
+        while(curr <= end) {
+            rows.push([
+                curr.toLocaleDateString('ar-EG'),
+                curr.toLocaleDateString('ar-EG', {weekday:'long'}),
+                staffData["القطاع المركزي"].list[getIdx("القطاع المركزي", curr)].n,
+                staffData["صيانة داقوق"].list[getIdx("صيانة داقوق", curr)].n,
+                staffData["صيانة تازة"].list[getIdx("صيانة تازة", curr)].n,
+                staffData["صيانة ليلان"].list[getIdx("صيانة ليلان", curr)].n,
+                staffData["صيانة الرشاد"].list[getIdx("صيانة الرشاد", curr)].n,
+                staffData["حراس القطاع"].list[getIdx("حراس القطاع", curr)].n
+            ]);
+            curr.setDate(curr.getDate()+1);
         }
+
+        const wb = XLSX.utils.book_new();
+        const ws = XLSX.utils.aoa_to_sheet(rows);
+        ws['!views'] = [{RTL: true}]; // ضبط اتجاه الإكسل لليمين
+        XLSX.utils.book_append_sheet(wb, ws, "المناوبات");
+        XLSX.writeFile(wb, `Kirkuk_Shifts_2026.xlsx`);
     }
 
-    // منطق الـ PWA
+    // منطق تثبيت التطبيق (PWA)
     window.addEventListener('beforeinstallprompt', (e) => {
-        e.preventDefault();
-        deferredPrompt = e;
+        e.preventDefault(); deferredPrompt = e;
         document.getElementById('install-row').style.display = 'flex';
     });
 
@@ -249,11 +256,14 @@
         }
     }
 
+    // تسجيل الخدمة (Service Worker)
     if ('serviceWorker' in navigator) {
         window.addEventListener('load', () => {
             navigator.serviceWorker.register('sw.js').catch(err => console.log('SW Error', err));
         });
     }
 </script>
+
 </body>
 </html>
+
