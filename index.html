@@ -54,9 +54,9 @@
         .card-info p { margin: 5px 0 0; font-size: 1.1rem; font-weight: 600; }
         .card-action a { color: #38bdf8; background: rgba(56, 189, 248, 0.1); width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: var(--neu-inset); }
 
-        /* العداد الزمني */
+        /* العداد الزمني المتبقي */
         .timer-box { background: var(--card-bg); padding: 15px; border-radius: 20px; box-shadow: var(--neu-inset); text-align: center; margin-top: 10px; border: 1px solid rgba(251, 191, 36, 0.1); }
-        .timer-text { color: var(--accent-gold); font-size: 0.9rem; font-weight: 600; }
+        .timer-text { color: var(--accent-gold); font-size: 0.9rem; font-weight: 600; text-shadow: 0 0 5px rgba(251, 191, 36, 0.2); }
 
         /* النوافذ الفرعية */
         .sub-page { position: fixed; inset: 0; background: var(--bg-color); z-index: 500; display: none; flex-direction: column; padding: 20px; }
@@ -73,14 +73,14 @@
         <div class="login-card">
             <i class="material-icons" style="font-size: 4.5rem; color: #38bdf8; text-shadow: var(--glow-blue);">bolt</i>
             <h1 style="margin: 15px 0 5px;">وزارة الكهرباء العراقية</h1>
-            <p style="color: var(--text-muted); margin-bottom: 30px;">توزيع كهرباء الشمال | قطاع داقوق - النظام الرقمي</p>
+            <p style="color: var(--text-muted); margin-bottom: 30px;">توزيع كهرباء الشمال | قطاع داقوق</p>
             
             <div id="install-row">
-                <button class="install-btn" onclick="triggerInstall()"><i class="material-icons">install_mobile</i> تثبيت التطبيق</button>
+                <button class="install-btn" onclick="triggerInstall()"><i class="material-icons">install_mobile</i> تثبيت التطبيق على الهاتف</button>
             </div>
 
             <button class="btn-main" onclick="startApp()">دخول النظام <i class="material-icons">login</i></button>
-            <p style="margin-top: 25px; font-size: 0.7rem; color: var(--accent-gold);">فكرة وتصميم: م. محمد سهران خورشيد جميع الحقوق محفوظة © 2026</p>
+            <p style="margin-top: 25px; font-size: 0.7rem; color: var(--accent-gold);">فكرة وتصميم: م. محمد سهران خورشيد © 2026</p>
         </div>
     </div>
 
@@ -140,34 +140,75 @@
         </div>
         <div style="text-align:center; padding-top:50px; opacity:0.5">
             <i class="material-icons" style="font-size:4rem">construction</i>
-            <p>قيد التحديث...</p>
+            <p>قيد التحديث للربط مع قاعدة البيانات...</p>
         </div>
     </div>
 
- <script>
-    // تاريخ المرجع لبدء تدوير المناوبات (9 آذار 2026)
-    const START_REF = new Date(2026, 2, 9, 8, 0, 0);
+<script>
+    // تاريخ المرجع المعتمد: السبت الماضي (4 نيسان 2026)
+    const START_REF = new Date(2026, 3, 4, 8, 0, 0); 
     let deferredPrompt;
 
-    // قاعدة البيانات المحدثة والمطابقة لواجهة العرض
+    // قاعدة البيانات المرتبة حسب دور السبت الماضي
     const staffData = {
-        "القطاع المركزي": { color: "#38bdf8", type: "daily", list: [{n: "مؤيد انور علي", p: "07702307824"}, {n: "احمد علي هزاع", p: "07708504330"}, {n: "محمد أصغر شريف", p: "07705119671"}, {n: "علي عبدالكريم حسين", p: "07705122140"}]},
-        "صيانة داقوق": { color: "#fb923c", type: "daily", list: [{n: "خنكار رضا قادر", p: "07748193844"}, {n: "جمعة احمد علاوي", p: "07706671144"}, {n: "سليم طه بزون", p: "07704307475"}]},
-        "صيانة تازة": { color: "#c084fc", type: "daily", list: [{n: "غريب عبدالله علي", p: "07738321108"}, {n: "مكرم شاكر صالح", p: "07738321128"}, {n: "عقيل حمدي خورشيد", p: "07719849187"}, {n: "عماد حسن حسين", p: "07701231951"}]},
-        "صيانة ليلان": { color: "#f87171", type: "two-day", list: [{n: "محمد داود طعمة", p: "07702365033"}, {n: "هشام كريم علي", p: "07706668042"}, {n: "شعبان خلف طعمة", p: "07735876486"}]},
-        "صيانة الرشاد": { color: "#4adede", type: "two-day", list: [{n: "زياد خلف حسن", p: "07705032908"}, {n: "عبدالستار احمد صالح", p: "07704914902"}]},
-        "حراس القطاع": { color: "#10b981", type: "daily", list: [{n: "كاظم اسماعيل", p: "07701074918"}, {n: "احمد نورالدين", p: "07708592190"}, {n: "عقيل أصغر", p: "07701274082"}]}
+        "القطاع المركزي": { 
+            color: "#38bdf8", type: "daily", 
+            list: [
+                {n: "احمد علي هزاع", p: "07708504330"}, // بدأ السبت
+                {n: "محمد أصغر شريف", p: "07705119671"}, 
+                {n: "علي عبدالكريم حسين", p: "07705122140"},
+                {n: "مؤيد انور علي", p: "07702307824"}
+            ]
+        },
+        "صيانة داقوق": { 
+            color: "#fb923c", type: "daily", 
+            list: [
+                {n: "جمعة احمد علاوي", p: "07706671144"}, // بدأ السبت
+                {n: "سليم طه بزون", p: "07704307475"}, 
+                {n: "خنكار رضا قادر", p: "07748193844"}
+            ]
+        },
+        "صيانة تازة": { 
+            color: "#c084fc", type: "daily", 
+            list: [
+                {n: "مكرم شاكر صالح", p: "07738321128"}, // بدأ السبت
+                {n: "عقيل حمدي خورشيد", p: "07719849187"}, 
+                {n: "عماد حسن حسين", p: "07701231951"},
+                {n: "غريب عبدالله علي", p: "07738321108"}
+            ]
+        },
+        "صيانة ليلان": { 
+            color: "#f87171", type: "two-day", 
+            list: [
+                {n: "محمد داود طعمة", p: "07702365033"}, // بدأ السبت (يومين)
+                {n: "هشام كريم علي", p: "07706668042"}, 
+                {n: "شعبان خلف طعمة", p: "07735876486"}
+            ]
+        },
+        "صيانة الرشاد": { 
+            color: "#4adede", type: "two-day", 
+            list: [
+                {n: "زياد خلف حسن", p: "07705032908"}, // بدأ السبت (يومين)
+                {n: "عبدالستار احمد صالح", p: "07704914902"}
+            ]
+        },
+        "حراس القطاع": { 
+            color: "#10b981", type: "daily", 
+            list: [
+                {n: "احمد نورالدين", p: "07708592190"}, // بدأ السبت
+                {n: "عقيل أصغر", p: "07701274082"},
+                {n: "كاظم اسماعيل", p: "07701074918"}
+            ]
+        }
     };
 
-    // تشغيل النظام عند الضغط على زر الدخول
     function startApp() { 
         document.getElementById('login-screen').style.display='none'; 
         document.getElementById('main-dashboard').style.display='flex'; 
         runClock(); 
-        renderCards(); // عرض البطاقات فوراً
+        renderCards(); 
     }
 
-    // تحديث الساعة والعداد الزمني
     function runClock() {
         const update = () => {
             const now = new Date();
@@ -183,7 +224,6 @@
         update(); setInterval(update, 1000);
     }
 
-    // حساب الفهرس (Index) بناءً على التاريخ
     function getIdx(key, date) {
         const d = new Date(date); 
         if(d.getHours() < 8) d.setDate(d.getDate() - 1);
@@ -193,7 +233,6 @@
         return Math.abs(index); 
     }
 
-    // توليد بطاقات المناوبين برمجياً
     function renderCards() {
         let h = ''; const now = new Date();
         for(let k in staffData) {
@@ -206,11 +245,9 @@
         document.getElementById('cards-list').innerHTML = h;
     }
 
-    // التنقل بين الصفحات
     function openPage(id) { document.getElementById(id).style.display = 'flex'; }
     function closePage() { document.querySelectorAll('.sub-page').forEach(p=>p.style.display='none'); }
 
-    // تصدير ملف Excel بنظام اليمين لليسار (RTL)
     function confirmAndExport() {
         const sStr = document.getElementById('report-start').value;
         const eStr = document.getElementById('report-end').value;
@@ -236,12 +273,12 @@
 
         const wb = XLSX.utils.book_new();
         const ws = XLSX.utils.aoa_to_sheet(rows);
-        ws['!views'] = [{RTL: true}]; // ضبط اتجاه الإكسل لليمين
+        ws['!views'] = [{RTL: true}];
         XLSX.utils.book_append_sheet(wb, ws, "المناوبات");
         XLSX.writeFile(wb, `Kirkuk_Shifts_2026.xlsx`);
     }
 
-    // منطق تثبيت التطبيق (PWA)
+    // PWA Logic
     window.addEventListener('beforeinstallprompt', (e) => {
         e.preventDefault(); deferredPrompt = e;
         document.getElementById('install-row').style.display = 'flex';
@@ -256,14 +293,11 @@
         }
     }
 
-    // تسجيل الخدمة (Service Worker)
     if ('serviceWorker' in navigator) {
         window.addEventListener('load', () => {
             navigator.serviceWorker.register('sw.js').catch(err => console.log('SW Error', err));
         });
     }
 </script>
-
 </body>
 </html>
-
