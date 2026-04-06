@@ -73,7 +73,7 @@
         <div class="neu-inset" style="background:var(--card-bg); padding:25px; border-radius:25px;">
             <label style="display:block; margin-bottom:8px; font-size:0.8rem; color:#38bdf8">من تاريخ:</label><input type="date" id="report-start" style="width:100%; padding:15px; margin-bottom:20px; background:#0d1117; color:white; border:none; border-radius:12px; outline:none">
             <label style="display:block; margin-bottom:8px; font-size:0.8rem; color:#38bdf8">إلى تاريخ:</label><input type="date" id="report-end" style="width:100%; padding:15px; margin-bottom:25px; background:#0d1117; color:white; border:none; border-radius:12px; outline:none">
-            <button class="btn-main" style="width:100%; justify-content:center" onclick="confirmAndExport()">تصدير جدول المناوبات</button>
+            <button class="btn-main" style="width:100%; justify-content:center" onclick="confirmAndExport()">تصدير جدول البيانات</button>
         </div>
     </div>
 
@@ -83,42 +83,41 @@
     </div>
 
 <script>
-    // تاريخ المرجع: السبت 4 نيسان 2026
     const START_REF = new Date(2026, 3, 4, 8, 0, 0); 
     let deferredPrompt;
 
     const staffData = {
-        "القطاع المركزي": { color: "#38bdf8", type: "daily", list: [
+        "القطاع المركزي": { type: "daily", list: [
             {n: "احمد علي هزاع", p: "07708504330"}, 
             {n: "مؤيد انور علي", p: "07702307824"}, 
             {n: "محمد اصغر شريف", p: "07705119671"}, 
             {n: "علي عبدالكريم حسين", p: "07705122140"}
-        ]},
-        "صيانة داقوق": { color: "#fb923c", type: "daily", list: [
+        ], color: "#38bdf8"},
+        "صيانة داقوق": { type: "daily", list: [
             {n: "جمعة احمد علاوي", p: "07706671144"}, 
             {n: "خنكار رضا قادر", p: "07748193844"}, 
             {n: "سليم طه بزون", p: "07704307475"}
-        ]},
-        "صيانة تازة": { color: "#c084fc", type: "daily", list: [
+        ], color: "#fb923c"},
+        "صيانة تازة": { type: "daily", list: [
             {n: "مكرم شاكر صالح", p: "07738321128"}, 
             {n: "غريب عبدالله علي", p: "07738321108"}, 
             {n: "عقيل حمدي خورشيد", p: "07719849187"}, 
             {n: "عماد حسن حسين", p: "07701231951"}
-        ]},
-        "صيانة ليلان": { color: "#f87171", type: "two-day", list: [
+        ], color: "#c084fc"},
+        "صيانة ليلان": { type: "two-day", list: [
             {n: "محمد داود طعمة", p: "07702365033"}, 
             {n: "هشام كريم علي", p: "07706668042"}, 
             {n: "شعبان خلف طعمة", p: "07735876486"}
-        ]},
-        "صيانة الرشاد": { color: "#4adede", type: "two-day", list: [
+        ], color: "#f87171"},
+        "صيانة الرشاد": { type: "two-day", list: [
             {n: "زياد خلف حسن", p: "07705032908"}, 
             {n: "عبدالستار احمد صالح", p: "07704914902"}
-        ]},
-        "حراس القطاع": { color: "#10b981", type: "daily", list: [
+        ], color: "#4adede"},
+        "حراس القطاع": { type: "daily", list: [
             {n: "احمد نورالدين", p: "07708592190"}, 
             {n: "كاظم اسماعيل", p: "07701074918"}, 
             {n: "عقيل أصغر", p: "07701274082"}
-        ]}
+        ], color: "#10b981"}
     };
 
     function startApp() { document.getElementById('login-screen').style.display='none'; document.getElementById('main-dashboard').style.display='flex'; runClock(); renderCards(); }
@@ -157,22 +156,23 @@
     function openPage(id) { document.getElementById(id).style.display = 'flex'; }
     function closePage() { document.querySelectorAll('.sub-page').forEach(p=>p.style.display='none'); }
 
-    // دالة التصدير المحدثة كلياً
     function confirmAndExport() {
         const sStr = document.getElementById('report-start').value;
         const eStr = document.getElementById('report-end').value;
         if(!sStr || !eStr) return alert("يرجى تحديد الفترة الزمنية");
 
-        const rows = [["التاريخ", "اليوم", "القطاع المركزي", "صيانة داقوق", "صيانة تازة", "صيانة ليلان", "صيانة الرشاد", "حراس القطاع"]];
-        let curr = new Date(sStr);
+        const start = new Date(sStr);
         const end = new Date(eStr);
+        end.setHours(23, 59, 59);
 
+        const rows = [["التاريخ", "اليوم", "القطاع المركزي", "صيانة داقوق", "صيانة تازة", "صيانة ليلان", "صيانة الرشاد", "حراس القطاع"]];
+        
+        let curr = new Date(start);
         while(curr <= end) {
             const getP = (key, d) => {
                 const item = staffData[key].list[getIdx(key, d)];
-                return `${item.n} (${item.p})`; // إضافة الرقم بجانب الاسم
+                return `${item.n}\n(${item.p})`; 
             };
-
             rows.push([
                 curr.toLocaleDateString('ar-EG'),
                 curr.toLocaleDateString('ar-EG', {weekday:'long'}),
@@ -189,18 +189,24 @@
         const wb = XLSX.utils.book_new();
         const ws = XLSX.utils.aoa_to_sheet(rows);
 
-        // ضبط اتجاه الورقة RTL
         ws['!views'] = [{ RTL: true }];
-
-        // حساب عرض الأعمدة تلقائياً بناءً على طول النصوص
-        const colWidths = rows[0].map((_, i) => {
-            const maxLen = Math.max(...rows.map(row => row[i] ? row[i].toString().length : 0));
-            return { wch: maxLen + 6 }; // زيادة هامش إضافي للتوسع
-        });
+        
+        // ضبط عرض الأعمدة وتوسيط البيانات
+        const colWidths = rows[0].map(() => ({ wch: 22 }));
         ws['!cols'] = colWidths;
 
+        // تطبيق التوسيط (في النسخ المتوافقة مع XLSX)
+        const range = XLSX.utils.decode_range(ws['!ref']);
+        for (let R = range.s.r; R <= range.e.r; ++R) {
+            for (let C = range.s.c; C <= range.e.c; ++C) {
+                const cell = ws[XLSX.utils.encode_cell({c:C, r:R})];
+                if(!cell) continue;
+                cell.s = { alignment: { vertical: "center", horizontal: "center", wrapText: true } };
+            }
+        }
+
         XLSX.utils.book_append_sheet(wb, ws, "جدول المناوبات");
-        XLSX.writeFile(wb, `Shifts_Report_${sStr}.xlsx`);
+        XLSX.writeFile(wb, `جدول البيانات مابين ${sStr} و ${eStr}.xlsx`);
     }
 
     window.addEventListener('beforeinstallprompt', (e) => { e.preventDefault(); deferredPrompt = e; document.getElementById('install-row').style.display = 'flex'; });
