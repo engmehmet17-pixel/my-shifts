@@ -22,7 +22,7 @@
         #clock-label { font-size: 2.8rem; font-weight: 300; color: #fff; text-shadow: var(--glow-blue); background: var(--card-bg); display: inline-block; padding: 10px 25px; border-radius: 20px; box-shadow: var(--neu-inset); }
         #date-label { color: var(--accent-gold); font-size: 1rem; margin-top: 15px; font-weight: 500; }
         .menu-grid { display: grid; grid-template-columns: repeat(2, 1fr); grid-gap: 15px; margin-bottom: 25px; }
-        .menu-item { background: var(--card-bg); border-radius: 20px; padding: 20px; color: var(--text-main); display: flex; flex-direction: column; align-items: center; gap: 10px; cursor: pointer; box-shadow: var(--neu-outset); border: 1px solid transparent; transition: 0.2s; }
+        .menu-item { background: var(--card-bg); border-radius: 20px; padding: 20px; color: var(--text-main); display: flex; flex-direction: column; align-items: center; gap: 10px; cursor: pointer; box-shadow: var(--neu-outset); transition: 0.2s; }
         .menu-item i { font-size: 2rem; color: #38bdf8; }
         .menu-item span { font-size: 0.9rem; font-weight: 500; color: var(--text-muted); }
         .section-title { font-size: 1.1rem; color: var(--accent-gold); margin: 20px 0 15px 5px; font-weight: 500; }
@@ -48,7 +48,7 @@
             <p style="color: var(--text-muted); margin-bottom: 30px;">توزيع كهرباء الشمال | قطاع داقوق</p>
             <div id="install-row"><button class="install-btn" onclick="triggerInstall()"><i class="material-icons">install_mobile</i> تثبيت التطبيق</button></div>
             <button class="btn-main" onclick="startApp()">دخول النظام <i class="material-icons">login</i></button>
-            <p style="margin-top: 25px; font-size: 0.7rem; color: var(--accent-gold);">فكرة وتصميم: م. محمد سهران خورشيد © 2026</p>
+            <p style="margin-top: 25px; font-size: 0.7rem; color: var(--accent-gold);">تصميم: م. محمد سهران خورشيد © 2026</p>
         </div>
     </div>
 
@@ -73,7 +73,7 @@
         <div class="neu-inset" style="background:var(--card-bg); padding:25px; border-radius:25px;">
             <label style="display:block; margin-bottom:8px; font-size:0.8rem; color:#38bdf8">من تاريخ:</label><input type="date" id="report-start" style="width:100%; padding:15px; margin-bottom:20px; background:#0d1117; color:white; border:none; border-radius:12px; outline:none">
             <label style="display:block; margin-bottom:8px; font-size:0.8rem; color:#38bdf8">إلى تاريخ:</label><input type="date" id="report-end" style="width:100%; padding:15px; margin-bottom:25px; background:#0d1117; color:white; border:none; border-radius:12px; outline:none">
-            <button class="btn-main" style="width:100%; justify-content:center" onclick="confirmAndExport()">تصدير الجدول (RTL)</button>
+            <button class="btn-main" style="width:100%; justify-content:center" onclick="confirmAndExport()">تصدير جدول المناوبات</button>
         </div>
     </div>
 
@@ -83,42 +83,41 @@
     </div>
 
 <script>
-    // تاريخ المرجع المعتمد: السبت 4 نيسان 2026
+    // تاريخ المرجع: السبت 4 نيسان 2026
     const START_REF = new Date(2026, 3, 4, 8, 0, 0); 
     let deferredPrompt;
 
-    // المصفوفات مرتبة حسب تسلسل (السبت -> الأحد -> الاثنين)
     const staffData = {
         "القطاع المركزي": { color: "#38bdf8", type: "daily", list: [
-            {n: "احمد علي هزاع", p: "07708504330"}, // السبت
-            {n: "مؤيد انور علي", p: "07702307824"}, // الأحد
-            {n: "محمد اصغر شريف", p: "07705119671"}, // الاثنين
+            {n: "احمد علي هزاع", p: "07708504330"}, 
+            {n: "مؤيد انور علي", p: "07702307824"}, 
+            {n: "محمد اصغر شريف", p: "07705119671"}, 
             {n: "علي عبدالكريم حسين", p: "07705122140"}
         ]},
         "صيانة داقوق": { color: "#fb923c", type: "daily", list: [
-            {n: "جمعة احمد علاوي", p: "07706671144"}, // السبت
-            {n: "خنكار رضا قادر", p: "07748193844"}, // الأحد
-            {n: "سليم طه بزون", p: "07704307475"}  // الاثنين
+            {n: "جمعة احمد علاوي", p: "07706671144"}, 
+            {n: "خنكار رضا قادر", p: "07748193844"}, 
+            {n: "سليم طه بزون", p: "07704307475"}
         ]},
         "صيانة تازة": { color: "#c084fc", type: "daily", list: [
-            {n: "مكرم شاكر صالح", p: "07738321128"}, // السبت
-            {n: "غريب عبدالله علي", p: "07738321108"}, // الأحد
-            {n: "عقيل حمدي خورشيد", p: "07719849187"}, // الاثنين
+            {n: "مكرم شاكر صالح", p: "07738321128"}, 
+            {n: "غريب عبدالله علي", p: "07738321108"}, 
+            {n: "عقيل حمدي خورشيد", p: "07719849187"}, 
             {n: "عماد حسن حسين", p: "07701231951"}
         ]},
         "صيانة ليلان": { color: "#f87171", type: "two-day", list: [
-            {n: "محمد داود طعمة", p: "07702365033"}, // السبت والأحد
-            {n: "هشام كريم علي", p: "07706668042"}, // الاثنين والثلاثاء
+            {n: "محمد داود طعمة", p: "07702365033"}, 
+            {n: "هشام كريم علي", p: "07706668042"}, 
             {n: "شعبان خلف طعمة", p: "07735876486"}
         ]},
         "صيانة الرشاد": { color: "#4adede", type: "two-day", list: [
-            {n: "زياد خلف حسن", p: "07705032908"}, // السبت والأحد
-            {n: "عبدالستار احمد صالح", p: "07704914902"} // الاثنين والثلاثاء
+            {n: "زياد خلف حسن", p: "07705032908"}, 
+            {n: "عبدالستار احمد صالح", p: "07704914902"}
         ]},
         "حراس القطاع": { color: "#10b981", type: "daily", list: [
-            {n: "احمد نورالدين", p: "07708592190"}, // السبت
-            {n: "كاظم اسماعيل", p: "07701074918"}, // الأحد
-            {n: "عقيل أصغر", p: "07701274082"}   // الاثنين
+            {n: "احمد نورالدين", p: "07708592190"}, 
+            {n: "كاظم اسماعيل", p: "07701074918"}, 
+            {n: "عقيل أصغر", p: "07701274082"}
         ]}
     };
 
@@ -158,18 +157,50 @@
     function openPage(id) { document.getElementById(id).style.display = 'flex'; }
     function closePage() { document.querySelectorAll('.sub-page').forEach(p=>p.style.display='none'); }
 
+    // دالة التصدير المحدثة كلياً
     function confirmAndExport() {
-        const s = document.getElementById('report-start').value, e = document.getElementById('report-end').value;
-        if(!s || !e) return alert("اختر التاريخ");
-        const rows = [["التاريخ", "اليوم", "القطاع", "داقوق", "تازة", "ليلان", "الرشاد", "الحراس"]];
-        let curr = new Date(s);
-        while(curr <= new Date(e)) {
-            rows.push([curr.toLocaleDateString('ar-EG'), curr.toLocaleDateString('ar-EG', {weekday:'long'}), staffData["القطاع المركزي"].list[getIdx("القطاع المركزي", curr)].n, staffData["صيانة داقوق"].list[getIdx("صيانة داقوق", curr)].n, staffData["صيانة تازة"].list[getIdx("صيانة تازة", curr)].n, staffData["صيانة ليلان"].list[getIdx("صيانة ليلان", curr)].n, staffData["صيانة الرشاد"].list[getIdx("صيانة الرشاد", curr)].n, staffData["حراس القطاع"].list[getIdx("حراس القطاع", curr)].n]);
-            curr.setDate(curr.getDate()+1);
+        const sStr = document.getElementById('report-start').value;
+        const eStr = document.getElementById('report-end').value;
+        if(!sStr || !eStr) return alert("يرجى تحديد الفترة الزمنية");
+
+        const rows = [["التاريخ", "اليوم", "القطاع المركزي", "صيانة داقوق", "صيانة تازة", "صيانة ليلان", "صيانة الرشاد", "حراس القطاع"]];
+        let curr = new Date(sStr);
+        const end = new Date(eStr);
+
+        while(curr <= end) {
+            const getP = (key, d) => {
+                const item = staffData[key].list[getIdx(key, d)];
+                return `${item.n} (${item.p})`; // إضافة الرقم بجانب الاسم
+            };
+
+            rows.push([
+                curr.toLocaleDateString('ar-EG'),
+                curr.toLocaleDateString('ar-EG', {weekday:'long'}),
+                getP("القطاع المركزي", curr),
+                getP("صيانة داقوق", curr),
+                getP("صيانة تازة", curr),
+                getP("صيانة ليلان", curr),
+                getP("صيانة الرشاد", curr),
+                getP("حراس القطاع", curr)
+            ]);
+            curr.setDate(curr.getDate() + 1);
         }
-        const wb = XLSX.utils.book_new(), ws = XLSX.utils.aoa_to_sheet(rows);
-        ws['!views'] = [{RTL: true}]; XLSX.utils.book_append_sheet(wb, ws, "المناوبات");
-        XLSX.writeFile(wb, `Shifts_Report.xlsx`);
+
+        const wb = XLSX.utils.book_new();
+        const ws = XLSX.utils.aoa_to_sheet(rows);
+
+        // ضبط اتجاه الورقة RTL
+        ws['!views'] = [{ RTL: true }];
+
+        // حساب عرض الأعمدة تلقائياً بناءً على طول النصوص
+        const colWidths = rows[0].map((_, i) => {
+            const maxLen = Math.max(...rows.map(row => row[i] ? row[i].toString().length : 0));
+            return { wch: maxLen + 6 }; // زيادة هامش إضافي للتوسع
+        });
+        ws['!cols'] = colWidths;
+
+        XLSX.utils.book_append_sheet(wb, ws, "جدول المناوبات");
+        XLSX.writeFile(wb, `Shifts_Report_${sStr}.xlsx`);
     }
 
     window.addEventListener('beforeinstallprompt', (e) => { e.preventDefault(); deferredPrompt = e; document.getElementById('install-row').style.display = 'flex'; });
