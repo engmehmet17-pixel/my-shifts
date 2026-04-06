@@ -48,7 +48,7 @@
             <p style="color: var(--text-muted); margin-bottom: 30px;">توزيع كهرباء الشمال | قطاع داقوق</p>
             <div id="install-row"><button class="install-btn" onclick="triggerInstall()"><i class="material-icons">install_mobile</i> تثبيت التطبيق</button></div>
             <button class="btn-main" onclick="startApp()">دخول النظام <i class="material-icons">login</i></button>
-            <p style="margin-top: 25px; font-size: 0.7rem; color: var(--accent-gold);">فكرة وتصميم: م. محمد سهران خورشيد © 2026</p>
+            <p style="margin-top: 25px; font-size: 0.7rem; color: var(--accent-gold);">فكرة وتصميم: م. محمد سهران خورشيد جميع الحقوق محفوظة © 2026</p>
         </div>
     </div>
 
@@ -75,11 +75,6 @@
             <label style="display:block; margin-bottom:8px; font-size:0.8rem; color:#38bdf8">إلى تاريخ:</label><input type="date" id="report-end" style="width:100%; padding:15px; margin-bottom:25px; background:#0d1117; color:white; border:none; border-radius:12px; outline:none">
             <button class="btn-main" style="width:100%; justify-content:center" onclick="confirmAndExport()">تصدير جدول البيانات</button>
         </div>
-    </div>
-
-    <div id="page-stations" class="sub-page">
-        <div class="page-header"><div class="back-circle" onclick="closePage()"><i class="material-icons">arrow_forward</i></div><h2 style="font-size: 1.1rem; margin:0;">مناوبي المحطات</h2></div>
-        <div style="text-align:center; padding-top:50px; opacity:0.5"><i class="material-icons" style="font-size:4rem">construction</i><p>قيد التحديث...</p></div>
     </div>
 
 <script>
@@ -136,12 +131,22 @@
         update(); setInterval(update, 1000);
     }
 
-    function getIdx(key, date) {
-        const d = new Date(date); if(d.getHours() < 8) d.setDate(d.getDate() - 1);
+    // دالة حساب المؤشر المحسنة لضمان التطابق
+    function getIdx(key, inputDate) {
+        let d = new Date(inputDate);
+        // إذا كان الوقت الممرر هو الساعة 00:00 (كما في تقرير الإكسل)، نضبطه ليكون ضمن نوبة اليوم (مثلاً الساعة 9 صباحاً)
+        // لضمان استخراج الأسماء الصحيحة لنوبة ذلك اليوم.
+        if (d.getHours() < 8) {
+            d.setHours(9, 0, 0); 
+        }
+        
         const diff = Math.floor((new Date(d).setHours(0,0,0,0) - new Date(START_REF).setHours(0,0,0,0)) / 86400000);
         const item = staffData[key];
         let idx = item.type === "two-day" ? Math.floor(diff/2) % item.list.length : diff % item.list.length;
-        return Math.abs(idx);
+        
+        // معالجة القيم السالبة في حال اختيار تاريخ قبل المرجع
+        if (idx < 0) idx += item.list.length;
+        return idx;
     }
 
     function renderCards() {
@@ -169,19 +174,24 @@
         
         let curr = new Date(start);
         while(curr <= end) {
+            // نمرر التاريخ الساعة 9 صباحاً لضمان الحصول على وجبة ذلك اليوم بشكل صحيح
+            let calculationDate = new Date(curr);
+            calculationDate.setHours(9, 0, 0);
+
             const getP = (key, d) => {
                 const item = staffData[key].list[getIdx(key, d)];
-                return `${item.n}\n(${item.p})`; 
+                return `${item.n} (${item.p})`; 
             };
+
             rows.push([
                 curr.toLocaleDateString('ar-EG'),
                 curr.toLocaleDateString('ar-EG', {weekday:'long'}),
-                getP("القطاع المركزي", curr),
-                getP("صيانة داقوق", curr),
-                getP("صيانة تازة", curr),
-                getP("صيانة ليلان", curr),
-                getP("صيانة الرشاد", curr),
-                getP("حراس القطاع", curr)
+                getP("القطاع المركزي", calculationDate),
+                getP("صيانة داقوق", calculationDate),
+                getP("صيانة تازة", calculationDate),
+                getP("صيانة ليلان", calculationDate),
+                getP("صيانة الرشاد", calculationDate),
+                getP("حراس القطاع", calculationDate)
             ]);
             curr.setDate(curr.getDate() + 1);
         }
@@ -191,11 +201,11 @@
 
         ws['!views'] = [{ RTL: true }];
         
-        // ضبط عرض الأعمدة وتوسيط البيانات
-        const colWidths = rows[0].map(() => ({ wch: 22 }));
+        // عرض الأعمدة وتوسيط البيانات
+        const colWidths = rows[0].map(() => ({ wch: 25 }));
         ws['!cols'] = colWidths;
 
-        // تطبيق التوسيط (في النسخ المتوافقة مع XLSX)
+        // التوسيط البرمجي
         const range = XLSX.utils.decode_range(ws['!ref']);
         for (let R = range.s.r; R <= range.e.r; ++R) {
             for (let C = range.s.c; C <= range.e.c; ++C) {
