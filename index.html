@@ -36,8 +36,6 @@
         .sub-page { position: fixed; inset: 0; background: var(--bg-color); z-index: 500; display: none; flex-direction: column; padding: 20px; }
         .page-header { display: flex; align-items: center; gap: 15px; margin-bottom: 25px; }
         .back-circle { background: var(--card-bg); width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: var(--neu-outset); color: #38bdf8; cursor: pointer; }
-        #install-row { display: none; margin-bottom: 15px; justify-content: center; }
-        .install-btn { background: #1e293b; color: var(--accent-gold); border: 1px solid var(--accent-gold); padding: 8px 15px; border-radius: 10px; font-size: 0.8rem; cursor: pointer; display: flex; align-items: center; gap: 8px; }
     </style>
 </head>
 <body>
@@ -46,7 +44,6 @@
             <i class="material-icons" style="font-size: 4.5rem; color: #38bdf8; text-shadow: var(--glow-blue);">bolt</i>
             <h1 style="margin: 15px 0 5px;">وزارة الكهرباء العراقية</h1>
             <p style="color: var(--text-muted); margin-bottom: 30px;">توزيع كهرباء الشمال | قطاع داقوق</p>
-            <div id="install-row"><button class="install-btn" onclick="triggerInstall()"><i class="material-icons">install_mobile</i> تثبيت التطبيق</button></div>
             <button class="btn-main" onclick="startApp()">دخول النظام <i class="material-icons">login</i></button>
             <p style="margin-top: 25px; font-size: 0.7rem; color: var(--accent-gold);">فكرة وتصميم: م. محمد سهران خورشيد جميع الحقوق محفوظة © 2026</p>
         </div>
@@ -79,40 +76,14 @@
 
 <script>
     const START_REF = new Date(2026, 3, 4, 8, 0, 0); 
-    let deferredPrompt;
 
     const staffData = {
-        "القطاع المركزي": { type: "daily", list: [
-            {n: "احمد علي هزاع", p: "07708504330"}, 
-            {n: "مؤيد انور علي", p: "07702307824"}, 
-            {n: "محمد اصغر شريف", p: "07705119671"}, 
-            {n: "علي عبدالكريم حسين", p: "07705122140"}
-        ], color: "#38bdf8"},
-        "صيانة داقوق": { type: "daily", list: [
-            {n: "جمعة احمد علاوي", p: "07706671144"}, 
-            {n: "خنكار رضا قادر", p: "07748193844"}, 
-            {n: "سليم طه بزون", p: "07704307475"}
-        ], color: "#fb923c"},
-        "صيانة تازة": { type: "daily", list: [
-            {n: "مكرم شاكر صالح", p: "07738321128"}, 
-            {n: "غريب عبدالله علي", p: "07738321108"}, 
-            {n: "عقيل حمدي خورشيد", p: "07719849187"}, 
-            {n: "عماد حسن حسين", p: "07701231951"}
-        ], color: "#c084fc"},
-        "صيانة ليلان": { type: "two-day", list: [
-            {n: "محمد داود طعمة", p: "07702365033"}, 
-            {n: "هشام كريم علي", p: "07706668042"}, 
-            {n: "شعبان خلف طعمة", p: "07735876486"}
-        ], color: "#f87171"},
-        "صيانة الرشاد": { type: "two-day", list: [
-            {n: "زياد خلف حسن", p: "07705032908"}, 
-            {n: "عبدالستار احمد صالح", p: "07704914902"}
-        ], color: "#4adede"},
-        "حراس القطاع": { type: "daily", list: [
-            {n: "احمد نورالدين", p: "07708592190"}, 
-            {n: "كاظم اسماعيل", p: "07701074918"}, 
-            {n: "عقيل أصغر", p: "07701274082"}
-        ], color: "#10b981"}
+        "القطاع المركزي": { type: "daily", list: [{n: "احمد علي هزاع", p: "07708504330"}, {n: "مؤيد انور علي", p: "07702307824"}, {n: "محمد اصغر شريف", p: "07705119671"}, {n: "علي عبدالكريم حسين", p: "07705122140"}], color: "#38bdf8"},
+        "صيانة داقوق": { type: "daily", list: [{n: "جمعة احمد علاوي", p: "07706671144"}, {n: "خنكار رضا قادر", p: "07748193844"}, {n: "سليم طه بزون", p: "07704307475"}], color: "#fb923c"},
+        "صيانة تازة": { type: "daily", list: [{n: "مكرم شاكر صالح", p: "07738321128"}, {n: "غريب عبدالله علي", p: "07738321108"}, {n: "عقيل حمدي خورشيد", p: "07719849187"}, {n: "عماد حسن حسين", p: "07701231951"}], color: "#c084fc"},
+        "صيانة ليلان": { type: "two-day", list: [{n: "محمد داود طعمة", p: "07702365033"}, {n: "هشام كريم علي", p: "07706668042"}, {n: "شعبان خلف طعمة", p: "07735876486"}], color: "#f87171"},
+        "صيانة الرشاد": { type: "two-day", list: [{n: "زياد خلف حسن", p: "07705032908"}, {n: "عبدالستار احمد صالح", p: "07704914902"}], color: "#4adede"},
+        "حراس القطاع": { type: "daily", list: [{n: "احمد نورالدين", p: "07708592190"}, {n: "كاظم اسماعيل", p: "07701074918"}, {n: "عقيل أصغر", p: "07701274082"}], color: "#10b981"}
     };
 
     function startApp() { document.getElementById('login-screen').style.display='none'; document.getElementById('main-dashboard').style.display='flex'; runClock(); renderCards(); }
@@ -127,24 +98,30 @@
             let diff = nxt - now;
             let h = Math.floor(diff / 3600000), m = Math.floor((diff % 3600000) / 60000), s = Math.floor((diff % 60000) / 1000);
             document.getElementById('time-remaining').innerText = `تبديل الوجبة خلال: ${h} س و ${m} د و ${s} ث`;
+            // تحديث البطاقات تلقائياً عند تمام الساعة الثامنة
+            if (now.getHours() === 8 && now.getMinutes() === 0 && now.getSeconds() === 0) renderCards();
         };
         update(); setInterval(update, 1000);
     }
 
-    // دالة حساب المؤشر المحسنة لضمان التطابق
-    function getIdx(key, inputDate) {
+    // دالة حساب المؤشر: الشاشة الرئيسية تستخدم الوقت الفعلي، الإكسل يستخدم وقت "مثالي"
+    function getIdx(key, inputDate, isExcel = false) {
         let d = new Date(inputDate);
-        // إذا كان الوقت الممرر هو الساعة 00:00 (كما في تقرير الإكسل)، نضبطه ليكون ضمن نوبة اليوم (مثلاً الساعة 9 صباحاً)
-        // لضمان استخراج الأسماء الصحيحة لنوبة ذلك اليوم.
-        if (d.getHours() < 8) {
-            d.setHours(9, 0, 0); 
+        
+        // في الشاشة الرئيسية: إذا كنا قبل الساعة 8 صباحاً، نحن نتبع وجبة "الأمس"
+        if (!isExcel && d.getHours() < 8) {
+            d.setDate(d.getDate() - 1);
         }
         
-        const diff = Math.floor((new Date(d).setHours(0,0,0,0) - new Date(START_REF).setHours(0,0,0,0)) / 86400000);
+        // تصفير الوقت للحساب اليومي
+        d.setHours(0,0,0,0);
+        const refDate = new Date(START_REF);
+        refDate.setHours(0,0,0,0);
+        
+        const diff = Math.floor((d - refDate) / 86400000);
         const item = staffData[key];
         let idx = item.type === "two-day" ? Math.floor(diff/2) % item.list.length : diff % item.list.length;
         
-        // معالجة القيم السالبة في حال اختيار تاريخ قبل المرجع
         if (idx < 0) idx += item.list.length;
         return idx;
     }
@@ -152,7 +129,7 @@
     function renderCards() {
         let h = ''; const now = new Date();
         for(let k in staffData) {
-            const p = staffData[k].list[getIdx(k, now)];
+            const p = staffData[k].list[getIdx(k, now, false)];
             h += `<div class="shift-card" style="border-right-color: ${staffData[k].color}"><div class="card-info"><h4>${k}</h4><p>${p.n}</p></div><div class="card-action"><a href="tel:${p.p}"><i class="material-icons">phone_enabled</i></a></div></div>`;
         }
         document.getElementById('cards-list').innerHTML = h;
@@ -174,54 +151,26 @@
         
         let curr = new Date(start);
         while(curr <= end) {
-            // نمرر التاريخ الساعة 9 صباحاً لضمان الحصول على وجبة ذلك اليوم بشكل صحيح
-            let calculationDate = new Date(curr);
-            calculationDate.setHours(9, 0, 0);
-
             const getP = (key, d) => {
-                const item = staffData[key].list[getIdx(key, d)];
+                const item = staffData[key].list[getIdx(key, d, true)]; // نرسل true لضمان بيانات اليوم المختار
                 return `${item.n} (${item.p})`; 
             };
 
             rows.push([
                 curr.toLocaleDateString('ar-EG'),
                 curr.toLocaleDateString('ar-EG', {weekday:'long'}),
-                getP("القطاع المركزي", calculationDate),
-                getP("صيانة داقوق", calculationDate),
-                getP("صيانة تازة", calculationDate),
-                getP("صيانة ليلان", calculationDate),
-                getP("صيانة الرشاد", calculationDate),
-                getP("حراس القطاع", calculationDate)
+                getP("القطاع المركزي", curr), getP("صيانة داقوق", curr), getP("صيانة تازة", curr), getP("صيانة ليلان", curr), getP("صيانة الرشاد", curr), getP("حراس القطاع", curr)
             ]);
             curr.setDate(curr.getDate() + 1);
         }
 
         const wb = XLSX.utils.book_new();
         const ws = XLSX.utils.aoa_to_sheet(rows);
-
         ws['!views'] = [{ RTL: true }];
-        
-        // عرض الأعمدة وتوسيط البيانات
-        const colWidths = rows[0].map(() => ({ wch: 25 }));
-        ws['!cols'] = colWidths;
-
-        // التوسيط البرمجي
-        const range = XLSX.utils.decode_range(ws['!ref']);
-        for (let R = range.s.r; R <= range.e.r; ++R) {
-            for (let C = range.s.c; C <= range.e.c; ++C) {
-                const cell = ws[XLSX.utils.encode_cell({c:C, r:R})];
-                if(!cell) continue;
-                cell.s = { alignment: { vertical: "center", horizontal: "center", wrapText: true } };
-            }
-        }
-
+        ws['!cols'] = rows[0].map(() => ({ wch: 25 }));
         XLSX.utils.book_append_sheet(wb, ws, "جدول المناوبات");
         XLSX.writeFile(wb, `جدول البيانات مابين ${sStr} و ${eStr}.xlsx`);
     }
-
-    window.addEventListener('beforeinstallprompt', (e) => { e.preventDefault(); deferredPrompt = e; document.getElementById('install-row').style.display = 'flex'; });
-    async function triggerInstall() { if (deferredPrompt) { deferredPrompt.prompt(); deferredPrompt = null; document.getElementById('install-row').style.display = 'none'; } }
-    if ('serviceWorker' in navigator) { window.addEventListener('load', () => { navigator.serviceWorker.register('sw.js'); }); }
 </script>
 </body>
 </html>
