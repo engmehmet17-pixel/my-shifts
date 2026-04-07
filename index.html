@@ -30,12 +30,16 @@
         .shift-card { background: var(--card-bg); border-radius: 18px; padding: 15px 20px; display: flex; justify-content: space-between; align-items: center; box-shadow: var(--neu-outset); border-right: 5px solid #38bdf8; }
         .card-info h4 { margin: 0; font-size: 0.8rem; color: var(--text-muted); }
         .card-info p { margin: 5px 0 0; font-size: 1.1rem; font-weight: 600; }
-        .card-action a { color: #38bdf8; background: rgba(56, 189, 248, 0.1); width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: var(--neu-inset); }
+        .card-action a { color: #38bdf8; background: rgba(56, 189, 248, 0.1); width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: var(--neu-inset); color: #38bdf8; }
         .timer-box { background: var(--card-bg); padding: 15px; border-radius: 20px; box-shadow: var(--neu-inset); text-align: center; margin-top: 10px; }
         .timer-text { color: var(--accent-gold); font-size: 0.9rem; font-weight: 600; }
         .sub-page { position: fixed; inset: 0; background: var(--bg-color); z-index: 500; display: none; flex-direction: column; padding: 20px; }
         .page-header { display: flex; align-items: center; gap: 15px; margin-bottom: 25px; }
         .back-circle { background: var(--card-bg); width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: var(--neu-outset); color: #38bdf8; cursor: pointer; }
+        
+        /* تنسيق زر التثبيت */
+        #install-row { display: none; margin-bottom: 15px; justify-content: center; }
+        .install-btn { background: #1e293b; color: var(--accent-gold); border: 1px solid var(--accent-gold); padding: 8px 15px; border-radius: 10px; font-size: 0.8rem; cursor: pointer; display: flex; align-items: center; gap: 8px; }
     </style>
 </head>
 <body>
@@ -43,7 +47,14 @@
         <div class="login-card">
             <i class="material-icons" style="font-size: 4.5rem; color: #38bdf8; text-shadow: var(--glow-blue);">bolt</i>
             <h1 style="margin: 15px 0 5px;">وزارة الكهرباء العراقية</h1>
-            <p style="color: var(--text-muted); margin-bottom: 30px;">توزيع كهرباء الشمال | قطاع داقوق</p>
+            <p style="color: var(--text-muted); margin-bottom: 20px;">توزيع كهرباء الشمال | قطاع داقوق</p>
+            
+            <div id="install-row">
+                <button class="install-btn" onclick="triggerInstall()">
+                    <i class="material-icons">install_mobile</i> تثبيت التطبيق
+                </button>
+            </div>
+
             <button class="btn-main" onclick="startApp()">دخول النظام <i class="material-icons">login</i></button>
             <p style="margin-top: 25px; font-size: 0.7rem; color: var(--accent-gold);">فكرة وتصميم: م. محمد سهران خورشيد جميع الحقوق محفوظة © 2026</p>
         </div>
@@ -76,6 +87,7 @@
 
 <script>
     const START_REF = new Date(2026, 3, 4, 8, 0, 0); 
+    let deferredPrompt;
 
     const staffData = {
         "القطاع المركزي": { type: "daily", list: [{n: "احمد علي هزاع", p: "07708504330"}, {n: "مؤيد انور علي", p: "07702307824"}, {n: "محمد اصغر شريف", p: "07705119671"}, {n: "علي عبدالكريم حسين", p: "07705122140"}], color: "#38bdf8"},
@@ -85,6 +97,24 @@
         "صيانة الرشاد": { type: "two-day", list: [{n: "زياد خلف حسن", p: "07705032908"}, {n: "عبدالستار احمد صالح", p: "07704914902"}], color: "#4adede"},
         "حراس القطاع": { type: "daily", list: [{n: "احمد نورالدين", p: "07708592190"}, {n: "كاظم اسماعيل", p: "07701074918"}, {n: "عقيل أصغر", p: "07701274082"}], color: "#10b981"}
     };
+
+    // منطق التثبيت (PWA)
+    window.addEventListener('beforeinstallprompt', (e) => {
+        e.preventDefault();
+        deferredPrompt = e;
+        document.getElementById('install-row').style.display = 'flex';
+    });
+
+    async function triggerInstall() {
+        if (deferredPrompt) {
+            deferredPrompt.prompt();
+            const { outcome } = await deferredPrompt.userChoice;
+            if (outcome === 'accepted') {
+                document.getElementById('install-row').style.display = 'none';
+            }
+            deferredPrompt = null;
+        }
+    }
 
     function startApp() { document.getElementById('login-screen').style.display='none'; document.getElementById('main-dashboard').style.display='flex'; runClock(); renderCards(); }
 
@@ -98,30 +128,22 @@
             let diff = nxt - now;
             let h = Math.floor(diff / 3600000), m = Math.floor((diff % 3600000) / 60000), s = Math.floor((diff % 60000) / 1000);
             document.getElementById('time-remaining').innerText = `تبديل الوجبة خلال: ${h} س و ${m} د و ${s} ث`;
-            // تحديث البطاقات تلقائياً عند تمام الساعة الثامنة
             if (now.getHours() === 8 && now.getMinutes() === 0 && now.getSeconds() === 0) renderCards();
         };
         update(); setInterval(update, 1000);
     }
 
-    // دالة حساب المؤشر: الشاشة الرئيسية تستخدم الوقت الفعلي، الإكسل يستخدم وقت "مثالي"
     function getIdx(key, inputDate, isExcel = false) {
         let d = new Date(inputDate);
-        
-        // في الشاشة الرئيسية: إذا كنا قبل الساعة 8 صباحاً، نحن نتبع وجبة "الأمس"
         if (!isExcel && d.getHours() < 8) {
             d.setDate(d.getDate() - 1);
         }
-        
-        // تصفير الوقت للحساب اليومي
         d.setHours(0,0,0,0);
         const refDate = new Date(START_REF);
         refDate.setHours(0,0,0,0);
-        
         const diff = Math.floor((d - refDate) / 86400000);
         const item = staffData[key];
         let idx = item.type === "two-day" ? Math.floor(diff/2) % item.list.length : diff % item.list.length;
-        
         if (idx < 0) idx += item.list.length;
         return idx;
     }
@@ -142,34 +164,31 @@
         const sStr = document.getElementById('report-start').value;
         const eStr = document.getElementById('report-end').value;
         if(!sStr || !eStr) return alert("يرجى تحديد الفترة الزمنية");
-
         const start = new Date(sStr);
         const end = new Date(eStr);
         end.setHours(23, 59, 59);
-
         const rows = [["التاريخ", "اليوم", "القطاع المركزي", "صيانة داقوق", "صيانة تازة", "صيانة ليلان", "صيانة الرشاد", "حراس القطاع"]];
-        
         let curr = new Date(start);
         while(curr <= end) {
             const getP = (key, d) => {
-                const item = staffData[key].list[getIdx(key, d, true)]; // نرسل true لضمان بيانات اليوم المختار
+                const item = staffData[key].list[getIdx(key, d, true)];
                 return `${item.n} (${item.p})`; 
             };
-
-            rows.push([
-                curr.toLocaleDateString('ar-EG'),
-                curr.toLocaleDateString('ar-EG', {weekday:'long'}),
-                getP("القطاع المركزي", curr), getP("صيانة داقوق", curr), getP("صيانة تازة", curr), getP("صيانة ليلان", curr), getP("صيانة الرشاد", curr), getP("حراس القطاع", curr)
-            ]);
+            rows.push([curr.toLocaleDateString('ar-EG'), curr.toLocaleDateString('ar-EG', {weekday:'long'}), getP("القطاع المركزي", curr), getP("صيانة داقوق", curr), getP("صيانة تازة", curr), getP("صيانة ليلان", curr), getP("صيانة الرشاد", curr), getP("حراس القطاع", curr)]);
             curr.setDate(curr.getDate() + 1);
         }
-
         const wb = XLSX.utils.book_new();
         const ws = XLSX.utils.aoa_to_sheet(rows);
         ws['!views'] = [{ RTL: true }];
         ws['!cols'] = rows[0].map(() => ({ wch: 25 }));
         XLSX.utils.book_append_sheet(wb, ws, "جدول المناوبات");
         XLSX.writeFile(wb, `جدول البيانات مابين ${sStr} و ${eStr}.xlsx`);
+    }
+
+    if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+            navigator.serviceWorker.register('sw.js').then(reg => console.log('SW Registered')).catch(err => console.log('SW Error', err));
+        });
     }
 </script>
 </body>
